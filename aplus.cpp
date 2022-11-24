@@ -13,18 +13,19 @@ const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
 
 enum game_state {				//game states
-	start,				//剛進入遊戲 
-	explanation,		//背景解說 
-	enter_stage,			//進入戰鬥畫面 
-	student_attacking,  //學生出牌 
-	professor_attacking,//教授回擊 
-	gatcha,				//抽考卷解答 
-	no_school,			//學生還沒打完BOSS就死掉的退學畫面 
-	get_f,				//學生打完BOSS但是沒集滿考卷的F畫面 
-	get_aplus			//學生成功拿到A+的畫面 
+	start,						//剛進入遊戲 
+	explanation,				//背景解說 
+	enter_stage,				//進入戰鬥畫面 
+	student_attacking,  		//學生出牌 
+	professor_attacking,		//教授回擊 
+	gatcha,						//抽考卷解答 
+	no_school,					//學生還沒打完BOSS就死掉的退學畫面 
+	get_f,						//學生打完BOSS但是沒集滿考卷的F畫面 
+	get_aplus					//學生成功拿到A+的畫面 
 };
-game_state state = start;     //define state as the variable indicates current game state
-
+game_state state = start;	  //define state as the variable indicates current game state
+int stage = 1;
+	
 bool init();				  //Starts up SDL and creates window
 
 bool loadMedia();     		  //Loads media
@@ -37,8 +38,10 @@ SDL_Window* gWindow = NULL;	  //The window we'll be rendering to
 
 SDL_Renderer* gRenderer = NULL;//The window renderer
 
-SDL_Texture* start_texture = NULL;  //texture of pictures
-SDL_Texture* explanation_texture = NULL;
+SDL_Texture* start_texture = NULL;  		//texture of start scene
+SDL_Texture* explanation_texture = NULL;	//texture of explanation scene
+SDL_Texture* burning_texture = NULL;		//texture of burning small icon
+SDL_Texture* stunning_texture = NULL; 		//texture of stunning small icon
 
 bool init()
 {
@@ -95,15 +98,20 @@ bool loadMedia()
 	//Load texture
 	start_texture = loadTexture( "./img/background.bmp" );
 	explanation_texture = loadTexture("./img/explanation.bmp");
-	if( start_texture == NULL )
-	{
-		printf( "Failed to load start_texture image!\n" );
-		success = false;
+	burning_texture = loadTexture("./img/fire.png");
+	stunning_texture = loadTexture("./img/stun.png");
+	
+	if( start_texture == NULL ){
+		printf( "Failed to load ./img/background.bmp !\n" );		success = false;
 	}
-	if( explanation_texture == NULL )
-	{
-		printf( "Failed to load explanation_texture image!\n" );
-		success = false;
+	if( explanation_texture == NULL ){
+		printf( "Failed to load ./img/explanation.bmp!\n" );	success = false;
+	}
+	if( burning_texture = NULL ){
+		printf( "Failed to load ./img/fire.png!\n" );	success = false;
+	}
+	if( stunning_texture = NULL ){
+		printf( "Failed to load ./img/stun.png!\n" );	success = false;
 	}
 
 	return success;
@@ -115,7 +123,13 @@ void close()
 	SDL_DestroyTexture( start_texture );
 	start_texture = NULL;
 	SDL_DestroyTexture( explanation_texture );
-	start_texture = NULL;
+	explanation_texture = NULL;
+	SDL_DestroyTexture( burning_texture );
+	burning_texture = NULL;
+	SDL_DestroyTexture( stunning_texture );
+	stunning_texture = NULL;
+	
+	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -218,6 +232,9 @@ int main( int argc, char* args[] )
                    	    	}
 						
 						}
+					}
+					else if (state == enter_stage){
+						
 					}
 					
 				}
