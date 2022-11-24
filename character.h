@@ -4,15 +4,15 @@ enum attribute{
 	grass
 };
 enum effect{
-	health_to_attack,  // attack increases while losing health
-	swifty,   //high avoid rate
-	armored,	//high defence 
-	stun,		//tend to stun student	  (stun every 3 rounds)
-	firing,		//tend to ignite student (ignite every 6 rounds)
+	health_to_attack,	// attack increases while losing health
+	swifty,  			// high avoid rate
+	armored,			// high defence 
+	stun,				// tend to stun student	  (stun every 3 rounds)
+	firing,				// tend to ignite student (ignite every 6 rounds)
 	
 };
 
-class student{						//class of the main character (student) 
+class student{						// class of the main character (student) 
 	private:
 		int health_limit;
 		bool living;
@@ -29,12 +29,12 @@ class student{						//class of the main character (student)
 		student();
 		void init();
 		
-		int get_health_limit();
-		void raise_health_limit(double);
+		int get_health_limit();				//取得血量上限 
+		void raise_health_limit(double);	//提高血量上限 
 		
-		bool alive();
+		bool alive();						//回傳是生(true)是死(false) 
 		
-		void hurt(double);
+		void hurt(double);					//受傷的函數，輸入受到的傷害，經過防禦計算後修改血量 
 };
 student::student(){
 	health_limit = 100;
@@ -95,12 +95,12 @@ bool student::alive(){
 
 
 
-class professor{
+class professor{					//class of enemy
 	
 	private:
 		int health_limit;
 		int difficulty;  			//討伐難度 
-		attribute element;
+		attribute element;			//屬性 
 		bool living;
 	public:
 		int health;
@@ -111,14 +111,14 @@ class professor{
 		double avoid_rate;
 		bool burning;
 		bool stunning;
-		effect special;
+		effect special;				//特殊技能 
 		
 		
 		professor(int);
-		attribute get_attribute() { return element; }
-		bool alive() { return living; }
+		attribute get_attribute() { return element; }	//回傳屬性 
+		bool alive() { return living; }					//回傳是否生存 
 		
-		//void hurt(double);
+		//void hurt(double);							//因為還不確定屬性相剋要怎麼寫，我就先不寫 
 };
 
 professor::professor(int a = 0){
