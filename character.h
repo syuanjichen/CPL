@@ -112,9 +112,11 @@ class professor{
 		bool burning;
 		bool stunning;
 		effect special;
-		professor(int);
 		
-		bool alive();
+		
+		professor(int);
+		attribute get_attribute() { return element; }
+		bool alive() { return living; }
 		
 		//void hurt(double);
 };
