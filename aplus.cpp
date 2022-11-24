@@ -1,6 +1,3 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2022)
-and may not be redistributed without written permission.*/
-
 //Using SDL, SDL_image, standard IO, and strings
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
@@ -24,7 +21,7 @@ enum game_state {				//game states
 	get_aplus					//學生成功拿到A+的畫面 
 };
 game_state state = start;	  //define state as the variable indicates current game state
-int stage = 1;
+int stage = 1;				  //stage 表示現在第幾個敵人 
 	
 bool init();				  //Starts up SDL and creates window
 
@@ -95,23 +92,22 @@ bool loadMedia()
 	//Loading success flag
 	bool success = true;
 
-	//Load texture
-	start_texture = loadTexture( "./img/background.bmp" );
+	start_texture = loadTexture( "./img/background.bmp" );		//在這裡來載入圖片 
 	explanation_texture = loadTexture("./img/explanation.bmp");
 	burning_texture = loadTexture("./img/fire.png");
 	stunning_texture = loadTexture("./img/stun.png");
 	
 	if( start_texture == NULL ){
-		printf( "Failed to load ./img/background.bmp !\n" );		success = false;
+		printf( "Failed to load ./img/background.bmp !\n" );	success = false;
 	}
 	if( explanation_texture == NULL ){
 		printf( "Failed to load ./img/explanation.bmp!\n" );	success = false;
 	}
 	if( burning_texture = NULL ){
-		printf( "Failed to load ./img/fire.png!\n" );	success = false;
+		printf( "Failed to load ./img/fire.png!\n" );			success = false;
 	}
 	if( stunning_texture = NULL ){
-		printf( "Failed to load ./img/stun.png!\n" );	success = false;
+		printf( "Failed to load ./img/stun.png!\n" );			success = false;
 	}
 
 	return success;
@@ -120,14 +116,10 @@ bool loadMedia()
 void close()
 {
 	//Free loaded image
-	SDL_DestroyTexture( start_texture );
-	start_texture = NULL;
-	SDL_DestroyTexture( explanation_texture );
-	explanation_texture = NULL;
-	SDL_DestroyTexture( burning_texture );
-	burning_texture = NULL;
-	SDL_DestroyTexture( stunning_texture );
-	stunning_texture = NULL;
+	SDL_DestroyTexture( start_texture );		start_texture = NULL;
+	SDL_DestroyTexture( explanation_texture );	explanation_texture = NULL;
+	SDL_DestroyTexture( burning_texture );		burning_texture = NULL;
+	SDL_DestroyTexture( stunning_texture );		stunning_texture = NULL;
 	
 	
 	//Destroy window	
@@ -184,11 +176,9 @@ int main( int argc, char* args[] )
 		}
 		else
 		{	
-			//Main loop flag
-			bool quit = false;
+			bool quit = false;	//Main loop flag
 
-			//Event handler
-			SDL_Event e;
+			SDL_Event e;		//Event handler
 
 			//While application is running
 			while( !quit )
@@ -238,14 +228,6 @@ int main( int argc, char* args[] )
 					}
 					
 				}
-				
-				
-				
-
-				
-				
-
-				
 				
 				
 			}
