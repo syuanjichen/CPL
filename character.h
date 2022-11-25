@@ -12,7 +12,8 @@ enum effect{
 	
 };
 
-class student{						// class of the main character (student) 
+
+class student_class{						// class of the main character (student) 
 	private:
 		int health_limit;
 		bool living;
@@ -26,7 +27,7 @@ class student{						// class of the main character (student)
 		bool burning;
 		bool stunning;
 		
-		student();
+		student_class();
 		void init();
 		
 		int get_health_limit();				//取得血量上限 
@@ -36,7 +37,7 @@ class student{						// class of the main character (student)
 		
 		void hurt(double);					//受傷的函數，輸入受到的傷害，經過防禦計算後修改血量 
 };
-student::student(){
+student_class::student_class(){
 	health_limit = 100;
 	living = true;
 	
@@ -50,7 +51,7 @@ student::student(){
 	stunning = false;
 	
 }
-void student::init(){
+void student_class::init(){
 	health_limit = 100;
 	living = true;
 	
@@ -63,13 +64,13 @@ void student::init(){
 	burning = false;
 	stunning = false;
 }
-int student::get_health_limit(){
+int student_class::get_health_limit(){
 	return health_limit;
 }
-void student::raise_health_limit(double a){
+void student_class::raise_health_limit(double a){
 	health_limit += (int)a;
 }
-void student::hurt(double a){
+void student_class::hurt(double a){
 	
 	a = a * ( 100 / (100 + defence) );
 	int damage = (int)a;
@@ -88,14 +89,14 @@ void student::hurt(double a){
 		shield -= damage;
 	}
 }
-bool student::alive(){
+bool student_class::alive(){
 	return living;
 }
 
 
 
 
-class professor{					//class of enemy
+class professor_class{					//class of enemy
 	
 	private:
 		int health_limit;
@@ -112,16 +113,17 @@ class professor{					//class of enemy
 		bool burning;
 		bool stunning;
 		effect special;				//特殊技能 
+		int ignite_counter;
+		int stun_counter;
 		
-		
-		professor(int);
+		professor_class(int);
 		attribute get_attribute() { return element; }	//回傳屬性 
 		bool alive() { return living; }					//回傳是否生存 
 		
 		//void hurt(double);							//因為還不確定屬性相剋要怎麼寫，我就先不寫 
 };
 
-professor::professor(int a = 0){
+professor_class::professor_class(int a = 0){
 	switch(a){
 		case 0:
 			health_limit = 200;
@@ -137,6 +139,8 @@ professor::professor(int a = 0){
 			burning = false;
 			stunning = false;
 			special = armored;
+			ignite_counter = 0;
+			stun_counter = 0;
 			break;	
 		case 1:
 			health_limit = 300;
@@ -152,7 +156,10 @@ professor::professor(int a = 0){
 			burning = false;
 			stunning = false;
 			special = swifty;
+			ignite_counter = 0;
+			stun_counter = 0;
 			break;
+			
 		case 2:
 			health_limit = 600;
 			difficulty = 3;
@@ -167,7 +174,10 @@ professor::professor(int a = 0){
 			burning = false;
 			stunning = false;
 			special = firing;
+			ignite_counter = 6;
+			stun_counter = 0;
 			break;
+			
 			
 		case 3:
 			health_limit = 1000;
@@ -183,6 +193,8 @@ professor::professor(int a = 0){
 			burning = false;
 			stunning = false;
 			special = stun;
+			ignite_counter = 0;
+			stun_counter = 3;
 			break;
 		case 4:
 			health_limit = 500;
@@ -198,6 +210,8 @@ professor::professor(int a = 0){
 			burning = false;
 			stunning = false;
 			special = health_to_attack;
+			ignite_counter = 0;
+			stun_counter = 0;
 			break;
 	}
 	

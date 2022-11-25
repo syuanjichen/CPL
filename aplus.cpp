@@ -35,11 +35,13 @@ SDL_Window* gWindow = NULL;	  //The window we'll be rendering to
 
 SDL_Renderer* gRenderer = NULL;//The window renderer
 
+SDL_Surface* gScreenSurface = NULL;
+
 SDL_Texture* start_texture = NULL;  		//texture of start scene
 SDL_Texture* explanation_texture = NULL;	//texture of explanation scene
 SDL_Texture* burning_texture = NULL;		//texture of burning small icon
 SDL_Texture* stunning_texture = NULL; 		//texture of stunning small icon
-
+SDL_Texture* claw_texture = NULL;			//texture of claw(attack of professor)
 bool init()
 {
 	//Initialization flag
@@ -81,7 +83,12 @@ bool init()
 		printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
 		success = false;
 	}	
-
+	gScreenSurface = SDL_GetWindowSurface( gWindow );
+	if( gScreenSurface == NULL )
+	{
+		printf( "gScreenSurface could not be created! SDL Error: %s\n", SDL_GetError() );
+		success = false;
+	}
 	
 
 	return success;
@@ -96,6 +103,8 @@ bool loadMedia()
 	explanation_texture = loadTexture("./img/explanation.bmp");
 	burning_texture = loadTexture("./img/fire.png");
 	stunning_texture = loadTexture("./img/stun.png");
+	claw_texture = loadTexture("./img/claw.bmp");
+	
 	
 	if( start_texture == NULL ){
 		printf( "Failed to load ./img/background.bmp !\n" );	success = false;
@@ -109,6 +118,9 @@ bool loadMedia()
 	if( stunning_texture = NULL ){
 		printf( "Failed to load ./img/stun.png!\n" );			success = false;
 	}
+	if( claw_texture = NULL ){
+		printf( "Failed to load ./img/claw.bmp!\n" );			success = false;
+	}
 
 	return success;
 }
@@ -120,6 +132,7 @@ void close()
 	SDL_DestroyTexture( explanation_texture );	explanation_texture = NULL;
 	SDL_DestroyTexture( burning_texture );		burning_texture = NULL;
 	SDL_DestroyTexture( stunning_texture );		stunning_texture = NULL;
+	SDL_DestroyTexture( claw_texture );			claw_texture = NULL;
 	
 	
 	//Destroy window	
@@ -146,6 +159,8 @@ SDL_Texture* loadTexture( std::string path )
 	}
 	else
 	{
+		
+		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
 		//Create texture from surface pixels
         newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
 		if( newTexture == NULL )
@@ -167,6 +182,7 @@ int main( int argc, char* args[] )
 	{
 		printf( "Failed to initialize!\n" );
 	}
+	
 	else
 	{
 		//Load media
@@ -176,10 +192,27 @@ int main( int argc, char* args[] )
 		}
 		else
 		{	
+			
 			bool quit = false;	//Main loop flag
 
 			SDL_Event e;		//Event handler
-
+			
+			student_class student;
+			
+			professor_class* professor;
+			professor = new professor_class [5];
+			for(int i=0;i<5;i++){
+				professor[i] = professor_class(i);
+				
+			}
+			
+			
+			SDL_Rect student_fire_rect = {90,270,90,90};
+			
+			
+			SDL_Rect student_stun_rect = {180,270,90,90};
+			
+			
 			//While application is running
 			while( !quit )
 			{
@@ -193,9 +226,10 @@ int main( int argc, char* args[] )
 						quit = true;
 					}
 					else if(state == start){
-						SDL_RenderClear( gRenderer );//Clear screen
-						SDL_RenderCopy( gRenderer, start_texture, NULL, NULL );//Render texture to screen
+						SDL_RenderClear (gRenderer);//Clear screen
+						SDL_RenderCopy( gRenderer, start_texture , NULL , NULL );//Render texture to screen
 						SDL_RenderPresent( gRenderer );//Update screen
+						
 						if(e.type == SDL_KEYDOWN){
 							
 							switch( e.key.keysym.sym )
@@ -218,12 +252,78 @@ int main( int argc, char* args[] )
                    	    	{
                    	 	    case SDLK_SPACE:
                    	     	    state = enter_stage;
+                   	     	    
                    	     	    break;
                    	    	}
 						
 						}
 					}
 					else if (state == enter_stage){
+						
+					}
+					else if (state == student_attacking){
+						
+					}
+					else if (state == professor_attacking){
+						
+						student.hurt( professor[ stage ].attack );
+
+						switch ( professor[ stage ].special ){
+							case health_to_attack:
+								if (student.burning == true)	student.burning = false;
+								if (student.stunning == true)	student.stunning = false;
+								break;
+							case swifty:
+								if (student.burning == true)	student.burning = false;
+								if (student.stunning == true)	student.stunning = false;
+								break;
+							case armored:
+								if (student.burning == true)	student.burning = false;
+								if (student.stunning == true)	student.stunning = false;
+								break;
+							case stun:
+								if(student.stunning == false && professor[stage].stun_counter >= 6){
+									student.stunning == true;
+									professor[stage].stun_counter = 0;
+								}
+								else{
+									if(professor[stage].stun_counter >= 2)
+										professor[stage].stun_counter = 0;
+									else
+										professor[stage].stun_counter +=1;
+									if (student.stunning == true)	student.stunning = false;
+								}
+								
+								if (student.burning == true)	student.burning = false;
+								break;
+								
+							case firing:
+								if(student.burning == false && professor[stage].ignite_counter >= 5){
+									student.burning == true;
+									professor[stage].ignite_counter = 0;
+								}
+								else{
+									if(professor[stage].ignite_counter >= 5)
+										professor[stage].ignite_counter = 0;
+									else
+										professor[stage].ignite_counter +=1;
+								}
+								if(student.stunning == true)	student.stunning = false;
+								break;
+							}
+						if( student.burning == true){ student.hurt(3); }
+						if( student.alive() == false ){	state = no_school; }
+					}
+					else if(state == gatcha){
+						
+					}
+					else if(state == no_school){
+						
+					}
+					else if(state == get_f){
+					
+					}
+					else if(state == get_aplus){
 						
 					}
 					
@@ -236,6 +336,6 @@ int main( int argc, char* args[] )
 
 	//Free resources and close SDL
 	close();
-
+	
 	return 0;
 }
