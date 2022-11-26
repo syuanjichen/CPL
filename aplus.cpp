@@ -42,6 +42,8 @@ SDL_Texture* explanation_texture = NULL;	//texture of explanation scene
 SDL_Texture* burning_texture = NULL;		//texture of burning small icon
 SDL_Texture* stunning_texture = NULL; 		//texture of stunning small icon
 SDL_Texture* claw_texture = NULL;			//texture of claw(attack of professor)
+SDL_Texture* get_f_texture = NULL;			//texture of get f
+
 bool init()
 {
 	//Initialization flag
@@ -101,10 +103,10 @@ bool loadMedia()
 
 	start_texture = loadTexture( "./img/background.bmp" );		//在這裡來載入圖片 
 	explanation_texture = loadTexture("./img/explanation.bmp");
-	burning_texture = loadTexture("./img/fire.png");
-	stunning_texture = loadTexture("./img/stun.png");
+	burning_texture = loadTexture("./img/fire.bmp");
+	stunning_texture = loadTexture("./img/stun.bmp");
 	claw_texture = loadTexture("./img/claw.bmp");
-	
+	get_f_texture = loadTexture("./img/get_f.bmp");
 	
 	if( start_texture == NULL ){
 		printf( "Failed to load ./img/background.bmp !\n" );	success = false;
@@ -113,13 +115,16 @@ bool loadMedia()
 		printf( "Failed to load ./img/explanation.bmp!\n" );	success = false;
 	}
 	if( burning_texture = NULL ){
-		printf( "Failed to load ./img/fire.png!\n" );			success = false;
+		printf( "Failed to load ./img/fire.bmp!\n" );			success = false;
 	}
 	if( stunning_texture = NULL ){
-		printf( "Failed to load ./img/stun.png!\n" );			success = false;
+		printf( "Failed to load ./img/stun.bmp!\n" );			success = false;
 	}
 	if( claw_texture = NULL ){
 		printf( "Failed to load ./img/claw.bmp!\n" );			success = false;
+	}
+	if( get_f_texture = NULL ){
+		printf( "Failed to load ./img/get_f.bmp!\n" );			success = false;
 	}
 
 	return success;
@@ -133,6 +138,7 @@ void close()
 	SDL_DestroyTexture( burning_texture );		burning_texture = NULL;
 	SDL_DestroyTexture( stunning_texture );		stunning_texture = NULL;
 	SDL_DestroyTexture( claw_texture );			claw_texture = NULL;
+	SDL_DestroyTexture( get_f_texture );		get_f_texture = NULL;
 	
 	
 	//Destroy window	
@@ -239,7 +245,7 @@ int main( int argc, char* args[] )
                 	        		SDL_RenderClear (gRenderer);//Clear screen
 									SDL_RenderCopy( gRenderer, explanation_texture , NULL , NULL );//Render texture to screen
 									SDL_RenderPresent( gRenderer );//Update screen
-                	        	    SDL_Delay(500);
+                	        	    
 									break;
                    	     	}
 						}
@@ -291,10 +297,10 @@ int main( int argc, char* args[] )
 										professor[stage].stun_counter = 0;
 									else
 										professor[stage].stun_counter +=1;
-									if (student.stunning == true)	student.stunning = false;
+									if (student.stunning == true){ student.stunning = false;}
 								}
 								
-								if (student.burning == true)	student.burning = false;
+								if (student.burning == true){ student.burning = false;}
 								break;
 								
 							case firing:
@@ -308,7 +314,7 @@ int main( int argc, char* args[] )
 									else
 										professor[stage].ignite_counter +=1;
 								}
-								if(student.stunning == true)	student.stunning = false;
+								if(student.stunning == true){ student.stunning = false;}
 								break;
 							}
 						if( student.burning == true){ student.hurt(3); }
