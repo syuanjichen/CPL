@@ -37,12 +37,209 @@ SDL_Renderer* gRenderer = NULL;//The window renderer
 
 SDL_Surface* gScreenSurface = NULL;
 
-SDL_Texture* start_texture = NULL;  		//texture of start scene
-SDL_Texture* explanation_texture = NULL;	//texture of explanation scene
-SDL_Texture* burning_texture = NULL;		//texture of burning small icon
-SDL_Texture* stunning_texture = NULL; 		//texture of stunning small icon
-SDL_Texture* claw_texture = NULL;			//texture of claw(attack of professor)
-SDL_Texture* get_f_texture = NULL;			//texture of get f
+			//texture of get f
+
+class LTexture
+{
+	public:
+		//Initializes variables
+		LTexture();
+
+		//Deallocates memory
+		~LTexture();
+
+		//Loads image at specified path
+		bool loadFromFile( std::string path );
+		
+		#if defined(SDL_TTF_MAJOR_VERSION)
+		//Creates image from font string
+		bool loadFromRenderedText( std::string textureText, SDL_Color textColor );
+		#endif
+		
+		//Deallocates texture
+		void free();
+
+		//Set color modulation
+		void setColor( Uint8 red, Uint8 green, Uint8 blue );
+
+		//Set blending
+		void setBlendMode( SDL_BlendMode blending );
+
+		//Set alpha modulation
+		void setAlpha( Uint8 alpha );
+		
+		//Renders texture at given point
+		void render( int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
+
+		//Gets image dimensions
+		int getWidth();
+		int getHeight();
+
+	private:
+		//The actual hardware texture
+		SDL_Texture* mTexture;
+
+		//Image dimensions
+		int mWidth;
+		int mHeight;
+};
+
+//Mouse button sprites
+
+
+//Buttons objects
+
+//Texture wrapper class
+
+
+//The mouse button
+LTexture::LTexture()
+{
+	//Initialize
+	mTexture = NULL;
+	mWidth = 0;
+	mHeight = 0;
+}
+
+LTexture::~LTexture()
+{
+	//Deallocate
+	free();
+}
+
+bool LTexture::loadFromFile( std::string path )
+{
+	//Get rid of preexisting texture
+	free();
+
+	//The final texture
+	SDL_Texture* newTexture = NULL;
+
+	//Load image at specified path
+	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
+	if( loadedSurface == NULL )
+	{
+		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
+	}
+	else
+	{
+		//Color key image
+		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
+
+		//Create texture from surface pixels
+        newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+		if( newTexture == NULL )
+		{
+			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = loadedSurface->w;
+			mHeight = loadedSurface->h;
+		}
+
+		//Get rid of old loaded surface
+		SDL_FreeSurface( loadedSurface );
+	}
+
+	//Return success
+	mTexture = newTexture;
+	return mTexture != NULL;
+}
+
+#if defined(SDL_TTF_MAJOR_VERSION)
+bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
+{
+	//Get rid of preexisting texture
+	free();
+
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
+	if( textSurface == NULL )
+	{
+		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+	}
+	else
+	{
+		//Create texture from surface pixels
+        mTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
+		if( mTexture == NULL )
+		{
+			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface( textSurface );
+	}
+	
+	//Return success
+	return mTexture != NULL;
+}
+#endif
+
+void LTexture::free()
+{
+	//Free texture if it exists
+	if( mTexture != NULL )
+	{
+		SDL_DestroyTexture( mTexture );
+		mTexture = NULL;
+		mWidth = 0;
+		mHeight = 0;
+	}
+}
+
+void LTexture::setColor( Uint8 red, Uint8 green, Uint8 blue )
+{
+	//Modulate texture rgb
+	SDL_SetTextureColorMod( mTexture, red, green, blue );
+}
+
+void LTexture::setBlendMode( SDL_BlendMode blending )
+{
+	//Set blending function
+	SDL_SetTextureBlendMode( mTexture, blending );
+}
+		
+void LTexture::setAlpha( Uint8 alpha )
+{
+	//Modulate texture alpha
+	SDL_SetTextureAlphaMod( mTexture, alpha );
+}
+
+void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
+{
+	//Set rendering space and render to screen
+//	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
+
+	//Set clip rendering dimensions
+//	if( clip != NULL )
+//	{
+//		renderQuad.w = clip->w;
+//		renderQuad.h = clip->h;
+//	}
+
+	//Render to screen
+	SDL_RenderCopyEx( gRenderer, mTexture, NULL, clip, angle, center, flip );
+}
+
+int LTexture::getWidth()
+{
+	return mWidth;
+}
+
+int LTexture::getHeight()
+{
+	return mHeight;
+}
+
 
 bool init()
 {
@@ -96,36 +293,32 @@ bool init()
 	return success;
 }
 
+
+LTexture start_texture ;  		//texture of start scene
+LTexture explanation_texture ;	//texture of explanation scene
+LTexture burning_texture ;		//texture of burning small icon
+LTexture stunning_texture ; 	//texture of stunning small icon
+LTexture claw_texture ;			//texture of claw(attack of professor)
+LTexture get_f_texture ;		//texture of getting f end
+
+
 bool loadMedia()
 {
 	//Loading success flag
 	bool success = true;
-
-	start_texture = loadTexture( "./img/background.bmp" );		//在這裡來載入圖片 
-	explanation_texture = loadTexture("./img/explanation.bmp");
-	burning_texture = loadTexture("./img/fire.bmp");
-	stunning_texture = loadTexture("./img/stun.bmp");
-	claw_texture = loadTexture("./img/claw.bmp");
-	get_f_texture = loadTexture("./img/get_f.bmp");
 	
-	if( start_texture == NULL ){
-		printf( "Failed to load ./img/background.bmp !\n" );	success = false;
-	}
-	if( explanation_texture == NULL ){
-		printf( "Failed to load ./img/explanation.bmp!\n" );	success = false;
-	}
-	if( burning_texture = NULL ){
-		printf( "Failed to load ./img/fire.bmp!\n" );			success = false;
-	}
-	if( stunning_texture = NULL ){
-		printf( "Failed to load ./img/stun.bmp!\n" );			success = false;
-	}
-	if( claw_texture = NULL ){
-		printf( "Failed to load ./img/claw.bmp!\n" );			success = false;
-	}
-	if( get_f_texture = NULL ){
-		printf( "Failed to load ./img/get_f.bmp!\n" );			success = false;
-	}
+	if( !start_texture.loadFromFile( "img/background.bmp" ) ){
+		printf( "Failed to load start texture!\n" );			success = false;	}
+	if( !explanation_texture.loadFromFile( "img/explanation.bmp" ) ){
+		printf( "Failed to load explanation texture!\n" );		success = false;	}
+	if( !burning_texture.loadFromFile( "img/fire.bmp" ) ){
+		printf( "Failed to load burning texture!\n" );			success = false;	}
+	if( !stunning_texture.loadFromFile( "img/stun.bmp" ) ){
+		printf( "Failed to load stunning texture!\n" );			success = false;	}
+	if( !claw_texture.loadFromFile( "img/claw.bmp" ) ){
+		printf( "Failed to load claw texture!\n" );				success = false;	}
+	if( !get_f_texture.loadFromFile( "img/get_f.bmp" ) ){
+		printf( "Failed to load get_f texture!\n" );			success = false;	}
 
 	return success;
 }
@@ -133,12 +326,12 @@ bool loadMedia()
 void close()
 {
 	//Free loaded image
-	SDL_DestroyTexture( start_texture );		start_texture = NULL;
-	SDL_DestroyTexture( explanation_texture );	explanation_texture = NULL;
-	SDL_DestroyTexture( burning_texture );		burning_texture = NULL;
-	SDL_DestroyTexture( stunning_texture );		stunning_texture = NULL;
-	SDL_DestroyTexture( claw_texture );			claw_texture = NULL;
-	SDL_DestroyTexture( get_f_texture );		get_f_texture = NULL;
+	start_texture.free();		
+	explanation_texture.free();	
+	burning_texture.free();		
+	stunning_texture.free();		
+	claw_texture.free();			
+	get_f_texture.free();		
 	
 	
 	//Destroy window	
@@ -146,40 +339,14 @@ void close()
 	SDL_DestroyWindow( gWindow );
 	gWindow = NULL;
 	gRenderer = NULL;
-
+	
+	
 	//Quit SDL subsystems
 	IMG_Quit();
 	SDL_Quit();
 }
 
-SDL_Texture* loadTexture( std::string path )
-{
-	//The final texture
-	SDL_Texture* newTexture = NULL;
 
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	if( loadedSurface == NULL )
-	{
-		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-	}
-	else
-	{
-		
-		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
-		//Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-		if( newTexture == NULL )
-		{
-			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface( loadedSurface );
-	}
-
-	return newTexture;
-}
 
 int main( int argc, char* args[] )
 {
@@ -206,16 +373,15 @@ int main( int argc, char* args[] )
 			student_class student;
 			
 			professor_class* professor;
-			professor = new professor_class [5];
+			professor = new professor_class [6];
 			for(int i=0;i<5;i++){
 				professor[i] = professor_class(i);
 				
 			}
+			professor[5] = professor_class(0);
 			
-			
-			SDL_Rect student_fire_rect = {90,270,90,90};
-			
-			
+			SDL_Rect student_burn_rect = {90,270,90,90}; //burning icon position
+			SDL_Rect professor_burn_rect = {90*13,90,90,90}; //burning icon position
 			SDL_Rect student_stun_rect = {180,270,90,90};
 			
 			
@@ -232,9 +398,8 @@ int main( int argc, char* args[] )
 						quit = true;
 					}
 					else if(state == start){
-						SDL_RenderClear (gRenderer);//Clear screen
-						SDL_RenderCopy( gRenderer, start_texture , NULL , NULL );//Render texture to screen
-						SDL_RenderPresent( gRenderer );//Update screen
+						start_texture.render(0,0);//Render texture to screen
+						SDL_RenderPresent( gRenderer );//update screen
 						
 						if(e.type == SDL_KEYDOWN){
 							
@@ -242,10 +407,8 @@ int main( int argc, char* args[] )
                 	        {
                 	    	    case SDLK_SPACE:
                 	        	    state = explanation;
-                	        		SDL_RenderClear (gRenderer);//Clear screen
-									SDL_RenderCopy( gRenderer, explanation_texture , NULL , NULL );//Render texture to screen
+                	        		explanation_texture.render(0,0);//Render texture to screen
 									SDL_RenderPresent( gRenderer );//Update screen
-                	        	    
 									break;
                    	     	}
 						}
@@ -265,6 +428,9 @@ int main( int argc, char* args[] )
 						}
 					}
 					else if (state == enter_stage){
+						explanation_texture.render(0,0);//Render texture to screen
+						burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect);
+						SDL_RenderPresent( gRenderer );//Update screen
 						
 					}
 					else if (state == student_attacking){
