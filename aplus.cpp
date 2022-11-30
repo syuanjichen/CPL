@@ -432,6 +432,7 @@ int main( int argc, char* args[] )
 						burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect);
 						SDL_RenderPresent( gRenderer );//Update screen
 						
+						
 					}
 					else if (state == student_attacking){
 						
