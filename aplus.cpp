@@ -1,10 +1,14 @@
 //Using SDL, SDL_image, standard IO, and strings
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
-#include <stdio.h>
+#include <SDL_ttf.h>
+#include <cstdio>
 #include <string>
 #include "character.h"
 #include <iostream>
+#include <ctime>
+#include <cmath>
+
 using namespace std;
 const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
@@ -29,15 +33,19 @@ bool loadMedia();     		  //Loads media
 
 void close();				  //Frees media and shuts down SDL
 
-SDL_Texture* loadTexture( std::string path );  //Loads individual image as texture
-
 SDL_Window* gWindow = NULL;	  //The window we'll be rendering to
 
 SDL_Renderer* gRenderer = NULL;//The window renderer
 
 SDL_Surface* gScreenSurface = NULL;
 
-			//texture of get f
+int probability(double hit_rate, double avoid_rate){
+	srand(time(NULL));
+	double rate = pow(hit_rate * (1-avoid_rate),0.5);
+	rate *= 100;
+	if( (rand()%100+1)>rate )	return 1 ;
+	else						return 0 ;
+}
 
 class LTexture
 {
@@ -443,7 +451,7 @@ int main( int argc, char* args[] )
 						}
 						else if( state == professor_attacking ){
 							
-							student.hurt( professor[ stage ].attack );
+							student.hurt( probability( professor.hit_rate, student.avoid_rate ) * professor[ stage ].attack );
 
 							switch ( professor[ stage ].special ){
 								case health_to_attack:
