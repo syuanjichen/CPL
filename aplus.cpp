@@ -14,18 +14,18 @@ const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
 
 enum game_state {				//game states
-	start,						//剛進入遊戲 
-	explanation,				//背景解說 
-	enter_stage,				//進入戰鬥畫面 
-	student_attacking,  		//學生出牌 
-	professor_attacking,		//教授回擊 
-	gatcha,						//抽考卷解答 
-	no_school,					//學生還沒打完BOSS就死掉的退學畫面 
-	get_f,						//學生打完BOSS但是沒集滿考卷的F畫面 
-	get_aplus					//學生成功拿到A+的畫面 
+	start,						//just entered game
+	explanation,				//game background detail explanation
+	enter_stage,				//enter battling stage
+	student_attacking,  		//student draw card and attack
+	professor_attacking,		//professor attack student
+	gatcha,						//draw a test paper
+	no_school,					//student be defeated by professor
+	get_f,						//student defeated boss but did not get all paper
+	get_aplus					//student defeated boss and got all paper
 };
 game_state state = start;	  //define state as the variable indicates current game state
-int stage = 1;				  //stage 表示現在第幾個敵人 
+int stage = 1;				  //stage indicate which stage now is in
 	
 bool init();				  //Starts up SDL and creates window
 
@@ -457,8 +457,8 @@ int main( int argc, char* args[] )
 					}
 					else if (state == explanation){
 						explanation_texture.render(0,0);//Render texture to screen
-						//這裡要render說明的文字
-						//或是把文字打在圖片裡 
+						//here to render the explanation words 
+						//or put the words in the explanation_texture
 						SDL_RenderPresent( gRenderer );//Update screen
 						if(e.type == SDL_KEYDOWN){
 							switch( e.key.keysym.sym )
@@ -470,7 +470,7 @@ int main( int argc, char* args[] )
 						}
 					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
-						explanation_texture.render(0,0);//Render texture to screen
+						stage_background_texture[stage].render(0,0);//Render texture to screen
 						if (student.burning){ burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect); }
 						if (student.stunning){ stunning_texture.render(student_stun_rect.x, student_stun_rect.y, &student_stun_rect);	}
 						if (professor[stage].burning){ burning_texture.render(professor_burn_rect.x, professor_burn_rect.y, &professor_burn_rect); }
@@ -478,11 +478,23 @@ int main( int argc, char* args[] )
 						
 						
 						
+						
+						
 						SDL_RenderPresent( gRenderer );//Update screen
+						
 						if ( state == enter_stage ){
+							//tell player what ability that enemy posesses
+							
 							
 						}
 						else if( state == student_attacking ){
+							//if mouse is on card: show detail
+							
+							//professor get hurt 
+							//professor died or not
+							
+							//deal with card effect
+							
 							
 						}
 						else if( state == professor_attacking ){
@@ -551,13 +563,13 @@ int main( int argc, char* args[] )
 						
 					}
 					else if(state == gatcha){
-						
+						//
 					}
 					else if(state == no_school){
-						//wasted動畫 
+						//wasted animation
 					}
 					else if(state == get_f){
-						//wasted動畫 
+						//wasted animation
 					}
 					else if(state == get_aplus){
 						

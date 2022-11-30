@@ -58,7 +58,7 @@ bool student_class::alive(){
 
 
 
-professor_class::professor_class(int a = 0){
+professor_class::professor_class(int a){
 	switch(a){
 		case 0:
 			health_limit = 200;

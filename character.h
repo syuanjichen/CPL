@@ -39,20 +39,20 @@ class student_class{						// class of the main character (student)
 		student_class();
 		void init();
 		
-		int get_health_limit();				//取得血量上限 
-		void raise_health_limit(double);	//提高血量上限 
+		int get_health_limit();				//
+		void raise_health_limit(double);	// 
 		
-		bool alive();						//回傳是生(true)是死(false) 
+		bool alive();						//return alive or not
 		
-		void hurt(double);					//受傷的函數，輸入受到的傷害，經過防禦計算後修改血量 
+		void hurt(double);					// input the damage and adjust the health of student by calculating defence factors
 };
 
 class professor_class{					//class of enemy
 	
 	private:
 		int health_limit;
-		int difficulty;  			//討伐難度 
-		attribute element;			//屬性 
+		int difficulty;  			//
+		attribute element;			//
 		bool living;
 	public:
 		int health;
@@ -63,15 +63,15 @@ class professor_class{					//class of enemy
 		double avoid_rate;
 		bool burning;
 		bool stunning;
-		effect special;				//特殊技能 
+		effect special;				//spacial ability
 		int ignite_counter;
 		int stun_counter;
 		
 		professor_class(int a = 0);
-		attribute get_attribute() { return element; }	//回傳屬性 
-		bool alive() { return living; }					//回傳是否生存 
+		attribute get_attribute() { return element; }	//return attribute
+		bool alive() { return living; }					//return alive or not 
 		
-		//void hurt(double);							//因為還不確定屬性相剋要怎麼寫，我就先不寫 
+		//void hurt(double);							//this is lee's job
 };
 
 
