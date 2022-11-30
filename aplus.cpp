@@ -427,65 +427,72 @@ int main( int argc, char* args[] )
 						
 						}
 					}
-					else if (state == enter_stage){
+					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						explanation_texture.render(0,0);//Render texture to screen
-						burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect);
+						if (student.burning){ burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect); }
+						
+						
+						
+						
 						SDL_RenderPresent( gRenderer );//Update screen
-						
-						
-					}
-					else if (state == student_attacking){
-						
-					}
-					else if (state == professor_attacking){
-						
-						student.hurt( professor[ stage ].attack );
+						if ( state == enter_stage ){
+							
+						}
+						else if( state == student_attacking ){
+							
+						}
+						else if( state == professor_attacking ){
+							
+							student.hurt( professor[ stage ].attack );
 
-						switch ( professor[ stage ].special ){
-							case health_to_attack:
-								if (student.burning == true)	student.burning = false;
-								if (student.stunning == true)	student.stunning = false;
-								break;
-							case swifty:
-								if (student.burning == true)	student.burning = false;
-								if (student.stunning == true)	student.stunning = false;
-								break;
-							case armored:
-								if (student.burning == true)	student.burning = false;
-								if (student.stunning == true)	student.stunning = false;
-								break;
-							case stun:
-								if(student.stunning == false && professor[stage].stun_counter >= 6){
-									student.stunning == true;
-									professor[stage].stun_counter = 0;
-								}
-								else{
-									if(professor[stage].stun_counter >= 2)
+							switch ( professor[ stage ].special ){
+								case health_to_attack:
+									if (student.burning == true)	student.burning = false;
+									if (student.stunning == true)	student.stunning = false;
+									break;
+								case swifty:
+									if (student.burning == true)	student.burning = false;
+									if (student.stunning == true)	student.stunning = false;
+									break;
+								case armored:
+									if (student.burning == true)	student.burning = false;
+									if (student.stunning == true)	student.stunning = false;
+									break;
+								case stun:
+									if(student.stunning == false && professor[stage].stun_counter >= 6){
+										student.stunning == true;
 										professor[stage].stun_counter = 0;
-									else
-										professor[stage].stun_counter +=1;
-									if (student.stunning == true){ student.stunning = false;}
-								}
-								
-								if (student.burning == true){ student.burning = false;}
-								break;
-								
-							case firing:
-								if(student.burning == false && professor[stage].ignite_counter >= 5){
-									student.burning == true;
-									professor[stage].ignite_counter = 0;
-								}
-								else{
-									if(professor[stage].ignite_counter >= 5)
+									}
+									else{
+										if(professor[stage].stun_counter >= 2)
+											professor[stage].stun_counter = 0;
+										else
+											professor[stage].stun_counter +=1;
+										if (student.stunning == true){ student.stunning = false;}
+									}
+									
+									if (student.burning == true){ student.burning = false;}
+									break;
+									
+								case firing:
+									if(student.burning == false && professor[stage].ignite_counter >= 5){
+										student.burning == true;
 										professor[stage].ignite_counter = 0;
-									else
-										professor[stage].ignite_counter +=1;
+									}
+									else{
+										if(professor[stage].ignite_counter >= 5)
+											professor[stage].ignite_counter = 0;
+										else
+											professor[stage].ignite_counter +=1;
+									}
+									if(student.stunning == true){ student.stunning = false;}
+									break;
 								}
-								if(student.stunning == true){ student.stunning = false;}
-								break;
+							if( student.burning == true){ student.hurt(3); }
+							if( student.alive() == false ){	state = no_school; }
 							}
-						if( student.burning == true){ student.hurt(3); }
-						if( student.alive() == false ){	state = no_school; }
+					
+						
 					}
 					else if(state == gatcha){
 						
