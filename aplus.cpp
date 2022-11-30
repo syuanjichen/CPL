@@ -41,11 +41,11 @@ SDL_Surface* gScreenSurface = NULL;
 
 TTF_Font *gFont = NULL;
 
-int probability(double hit_rate, double avoid_rate){
+int probability(double hit_rate, double avoid_rate){		//function of hitting of not
 	srand(time(NULL));
 	double rate = pow(hit_rate * (1-avoid_rate),0.5);
 	rate *= 100;
-	if( (rand()%100+1)>rate )	return 1 ;
+	if( (rand()%100+1) < rate )	return 1 ;
 	else						return 0 ;
 }
 
@@ -310,7 +310,8 @@ LTexture burning_texture ;		//texture of burning small icon
 LTexture stunning_texture ; 	//texture of stunning small icon
 LTexture claw_texture ;			//texture of claw(attack of professor)
 LTexture get_f_texture ;		//texture of getting f end
-
+LTexture professor_texture[6] ;	//texture of professor
+LTexture stage_background_texture[6];	//texture of battle backgrounds
 
 bool loadMedia()
 {
@@ -329,13 +330,33 @@ bool loadMedia()
 		printf( "Failed to load claw texture!\n" );				success = false;	}
 	if( !get_f_texture.loadFromFile( "img/get_f.bmp" ) ){
 		printf( "Failed to load get_f texture!\n" );			success = false;	}
+	if( !professor_texture[1].loadFromFile( "img/monster_1.bmp" ) ){
+		printf( "Failed to load monster 1 texture!\n" );		success = false;	}
+	if( !professor_texture[2].loadFromFile( "img/monster_2.bmp" ) ){
+		printf( "Failed to load monster 2 texture!\n" );		success = false;	}
+	if( !professor_texture[3].loadFromFile( "img/monster_3.bmp" ) ){
+		printf( "Failed to load monster 3 texture!\n" );		success = false;	}
+	if( !professor_texture[4].loadFromFile( "img/monster_4.bmp" ) ){
+		printf( "Failed to load monster 4 texture!\n" );		success = false;	}
+	if( !professor_texture[5].loadFromFile( "img/monster_5.bmp" ) ){
+		printf( "Failed to load monster 5 texture!\n" );		success = false;	}
+	if( !stage_background_texture[1].loadFromFile( "img/stage_background_1.bmp" ) ){
+		printf( "Failed to load monster 1 texture!\n" );		success = false;	}
+	if( !stage_background_texture[2].loadFromFile( "img/stage_background_2.bmp" ) ){
+		printf( "Failed to load monster 2 texture!\n" );		success = false;	}
+	if( !stage_background_texture[3].loadFromFile( "img/stage_background_3.bmp" ) ){
+		printf( "Failed to load monster 3 texture!\n" );		success = false;	}
+	if( !stage_background_texture[4].loadFromFile( "img/stage_background_4.bmp" ) ){
+		printf( "Failed to load monster 4 texture!\n" );		success = false;	}
+	if( !stage_background_texture[5].loadFromFile( "img/stage_background_5.bmp" ) ){
+		printf( "Failed to load monster 5 texture!\n" );		success = false;	}
 
-    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
-    if( gFont == NULL )
-	{
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-		success = false;
-	}
+//    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
+//    if( gFont == NULL )
+//	{
+//		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+//		success = false;
+//	}
 	return success;
 }
 
@@ -348,6 +369,11 @@ void close()
 	stunning_texture.free();		
 	claw_texture.free();			
 	get_f_texture.free();		
+	for(int i=0;i<6;i++){
+		stage_background_texture[i].free();
+		professor_texture[i].free();
+	}
+	
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -398,10 +424,10 @@ int main( int argc, char* args[] )
 			}
 			professor[5] = professor_class(0);
 			
-			SDL_Rect student_burn_rect = {90,270,90,90}; //burning icon position
+			SDL_Rect student_burn_rect = {90*2,90*5,90,90}; //burning icon position
 			SDL_Rect professor_burn_rect = {90*13,90,90,90}; //burning icon position
-			SDL_Rect student_stun_rect = {180,270,90,90};
-			
+			SDL_Rect student_stun_rect = {90*2,90*6,90,90};
+			SDL_Rect professor_stun_rect = {90*13,90*2,90,90}; //burning icon position
 			
 			//While application is running
 			while( !quit )
@@ -425,29 +451,29 @@ int main( int argc, char* args[] )
                 	        {
                 	    	    case SDLK_SPACE:
                 	        	    state = explanation;
-                	        		explanation_texture.render(0,0);//Render texture to screen
-									SDL_RenderPresent( gRenderer );//Update screen
-									break;
+                	        		break;
                    	     	}
 						}
 					}
 					else if (state == explanation){
-						
-						
+						explanation_texture.render(0,0);//Render texture to screen
+						//這裡要render說明的文字
+						//或是把文字打在圖片裡 
+						SDL_RenderPresent( gRenderer );//Update screen
 						if(e.type == SDL_KEYDOWN){
 							switch( e.key.keysym.sym )
                    	    	{
                    	 	    case SDLK_SPACE:
                    	     	    state = enter_stage;
-                   	     	    
                    	     	    break;
                    	    	}
-						
 						}
 					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						explanation_texture.render(0,0);//Render texture to screen
 						if (student.burning){ burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect); }
+						if (student.stunning){ stunning_texture.render(student_stun_rect.x, student_stun_rect.y, &student_stun_rect);	}
+						if (professor[stage].burning){ burning_texture.render(professor_burn_rect.x, professor_burn_rect.y, &professor_burn_rect); }
 						
 						
 						
@@ -461,22 +487,29 @@ int main( int argc, char* args[] )
 						}
 						else if( state == professor_attacking ){
 							
-							student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
+							if(!professor[stage].stunning){
+								student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
 
-							switch ( professor[ stage ].special ){
-								case health_to_attack:
+								switch ( professor[ stage ].special ){
+									case health_to_attack:
 									if (student.burning == true)	student.burning = false;
 									if (student.stunning == true)	student.stunning = false;
 									break;
-								case swifty:
+									
+									
+									case swifty:
 									if (student.burning == true)	student.burning = false;
 									if (student.stunning == true)	student.stunning = false;
 									break;
-								case armored:
+									
+									
+									case armored:
 									if (student.burning == true)	student.burning = false;
 									if (student.stunning == true)	student.stunning = false;
 									break;
-								case stun:
+									
+									
+									case stun:
 									if(student.stunning == false && professor[stage].stun_counter >= 6){
 										student.stunning == true;
 										professor[stage].stun_counter = 0;
@@ -492,7 +525,8 @@ int main( int argc, char* args[] )
 									if (student.burning == true){ student.burning = false;}
 									break;
 									
-								case firing:
+										
+									case firing:
 									if(student.burning == false && professor[stage].ignite_counter >= 5){
 										student.burning == true;
 										professor[stage].ignite_counter = 0;
@@ -505,10 +539,14 @@ int main( int argc, char* args[] )
 									}
 									if(student.stunning == true){ student.stunning = false;}
 									break;
+									
 								}
+								
+							}
+							
 							if( student.burning == true){ student.hurt(3); }
 							if( student.alive() == false ){	state = no_school; }
-							}
+						}
 					
 						
 					}
@@ -516,10 +554,10 @@ int main( int argc, char* args[] )
 						
 					}
 					else if(state == no_school){
-						
+						//wasted動畫 
 					}
 					else if(state == get_f){
-					
+						//wasted動畫 
 					}
 					else if(state == get_aplus){
 						
