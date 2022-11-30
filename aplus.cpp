@@ -39,6 +39,8 @@ SDL_Renderer* gRenderer = NULL;//The window renderer
 
 SDL_Surface* gScreenSurface = NULL;
 
+TTF_Font *gFont = NULL;
+
 int probability(double hit_rate, double avoid_rate){
 	srand(time(NULL));
 	double rate = pow(hit_rate * (1-avoid_rate),0.5);
@@ -328,6 +330,12 @@ bool loadMedia()
 	if( !get_f_texture.loadFromFile( "img/get_f.bmp" ) ){
 		printf( "Failed to load get_f texture!\n" );			success = false;	}
 
+    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
+    if( gFont == NULL )
+	{
+		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		success = false;
+	}
 	return success;
 }
 
@@ -341,6 +349,8 @@ void close()
 	claw_texture.free();			
 	get_f_texture.free();		
 	
+	TTF_CloseFont( gFont );
+	gFont = NULL;
 	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
@@ -451,7 +461,7 @@ int main( int argc, char* args[] )
 						}
 						else if( state == professor_attacking ){
 							
-							student.hurt( probability( professor.hit_rate, student.avoid_rate ) * professor[ stage ].attack );
+							student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
 
 							switch ( professor[ stage ].special ){
 								case health_to_attack:
