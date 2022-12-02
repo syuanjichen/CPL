@@ -4,14 +4,19 @@
 #include <SDL_ttf.h>
 #include <cstdio>
 #include <string>
-#include "character.h"
 #include <iostream>
 #include <ctime>
 #include <cmath>
+#include "character.h"
+#include "LTexture.h"
+#include "healthbar.h"
 
 using namespace std;
 const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
+
+int block_x = SCREEN_WIDTH/16;
+int block_y = SCREEN_HEIGHT/9;
 
 enum game_state {				//game states
 	start,						//just entered game
@@ -35,11 +40,17 @@ void close();				  //Frees media and shuts down SDL
 
 SDL_Window* gWindow = NULL;	  //The window we'll be rendering to
 
+#ifndef _GRENDERER
+#define _GRENDERER
 SDL_Renderer* gRenderer = NULL;//The window renderer
+#endif
 
 SDL_Surface* gScreenSurface = NULL;
 
+#ifndef _GFONT
+#define _GFONT 
 TTF_Font *gFont = NULL;
+#endif
 
 int probability(double hit_rate, double avoid_rate){		//function of hitting of not
 	srand(time(NULL));
@@ -49,50 +60,7 @@ int probability(double hit_rate, double avoid_rate){		//function of hitting of n
 	else						return 0 ;
 }
 
-class LTexture
-{
-	public:
-		//Initializes variables
-		LTexture();
 
-		//Deallocates memory
-		~LTexture();
-
-		//Loads image at specified path
-		bool loadFromFile( std::string path );
-		
-		#if defined(SDL_TTF_MAJOR_VERSION)
-		//Creates image from font string
-		bool loadFromRenderedText( std::string textureText, SDL_Color textColor );
-		#endif
-		
-		//Deallocates texture
-		void free();
-
-		//Set color modulation
-		void setColor( Uint8 red, Uint8 green, Uint8 blue );
-
-		//Set blending
-		void setBlendMode( SDL_BlendMode blending );
-
-		//Set alpha modulation
-		void setAlpha( Uint8 alpha );
-		
-		//Renders texture at given point
-		void render( int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
-
-		//Gets image dimensions
-		int getWidth();
-		int getHeight();
-
-	private:
-		//The actual hardware texture
-		SDL_Texture* mTexture;
-
-		//Image dimensions
-		int mWidth;
-		int mHeight;
-};
 
 //Mouse button sprites
 
@@ -101,154 +69,8 @@ class LTexture
 
 //Texture wrapper class
 
-
 //The mouse button
-LTexture::LTexture()
-{
-	//Initialize
-	mTexture = NULL;
-	mWidth = 0;
-	mHeight = 0;
-}
 
-LTexture::~LTexture()
-{
-	//Deallocate
-	free();
-}
-
-bool LTexture::loadFromFile( std::string path )
-{
-	//Get rid of preexisting texture
-	free();
-
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	if( loadedSurface == NULL )
-	{
-		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-	}
-	else
-	{
-		//Color key image
-		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
-
-		//Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-		if( newTexture == NULL )
-		{
-			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-		}
-		else
-		{
-			//Get image dimensions
-			mWidth = loadedSurface->w;
-			mHeight = loadedSurface->h;
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface( loadedSurface );
-	}
-
-	//Return success
-	mTexture = newTexture;
-	return mTexture != NULL;
-}
-
-#if defined(SDL_TTF_MAJOR_VERSION)
-bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
-{
-	//Get rid of preexisting texture
-	free();
-
-	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
-	if( textSurface == NULL )
-	{
-		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
-	}
-	else
-	{
-		//Create texture from surface pixels
-        mTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
-		if( mTexture == NULL )
-		{
-			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
-		}
-		else
-		{
-			//Get image dimensions
-			mWidth = textSurface->w;
-			mHeight = textSurface->h;
-		}
-
-		//Get rid of old surface
-		SDL_FreeSurface( textSurface );
-	}
-	
-	//Return success
-	return mTexture != NULL;
-}
-#endif
-
-void LTexture::free()
-{
-	//Free texture if it exists
-	if( mTexture != NULL )
-	{
-		SDL_DestroyTexture( mTexture );
-		mTexture = NULL;
-		mWidth = 0;
-		mHeight = 0;
-	}
-}
-
-void LTexture::setColor( Uint8 red, Uint8 green, Uint8 blue )
-{
-	//Modulate texture rgb
-	SDL_SetTextureColorMod( mTexture, red, green, blue );
-}
-
-void LTexture::setBlendMode( SDL_BlendMode blending )
-{
-	//Set blending function
-	SDL_SetTextureBlendMode( mTexture, blending );
-}
-		
-void LTexture::setAlpha( Uint8 alpha )
-{
-	//Modulate texture alpha
-	SDL_SetTextureAlphaMod( mTexture, alpha );
-}
-
-void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
-{
-	//Set rendering space and render to screen
-//	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
-
-	//Set clip rendering dimensions
-//	if( clip != NULL )
-//	{
-//		renderQuad.w = clip->w;
-//		renderQuad.h = clip->h;
-//	}
-
-	//Render to screen
-	SDL_RenderCopyEx( gRenderer, mTexture, NULL, clip, angle, center, flip );
-}
-
-int LTexture::getWidth()
-{
-	return mWidth;
-}
-
-int LTexture::getHeight()
-{
-	return mHeight;
-}
 
 
 bool init()
@@ -304,14 +126,16 @@ bool init()
 }
 
 
-LTexture start_texture ;  		//texture of start scene
-LTexture explanation_texture ;	//texture of explanation scene
-LTexture burning_texture ;		//texture of burning small icon
-LTexture stunning_texture ; 	//texture of stunning small icon
-LTexture claw_texture ;			//texture of claw(attack of professor)
-LTexture get_f_texture ;		//texture of getting f end
-LTexture professor_texture[6] ;	//texture of professor
+LTexture start_texture ;  				//texture of start scene
+LTexture explanation_texture ;			//texture of explanation scene
+LTexture burning_texture ;				//texture of burning small icon
+LTexture stunning_texture ; 			//texture of stunning small icon
+LTexture claw_texture ;					//texture of claw(attack of professor)
+LTexture get_f_texture ;				//texture of getting f end
+LTexture professor_texture[6] ;			//texture of professor
 LTexture stage_background_texture[6];	//texture of battle backgrounds
+LTexture healthbar_texture ;			//texture of healthbar
+
 
 bool loadMedia()
 {
@@ -341,15 +165,17 @@ bool loadMedia()
 	if( !professor_texture[5].loadFromFile( "img/monster_5.bmp" ) ){
 		printf( "Failed to load monster 5 texture!\n" );		success = false;	}
 	if( !stage_background_texture[1].loadFromFile( "img/stage_background_1.bmp" ) ){
-		printf( "Failed to load monster 1 texture!\n" );		success = false;	}
+		printf( "Failed to load stage 1 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[2].loadFromFile( "img/stage_background_2.bmp" ) ){
-		printf( "Failed to load monster 2 texture!\n" );		success = false;	}
+		printf( "Failed to load stage 2 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[3].loadFromFile( "img/stage_background_3.bmp" ) ){
-		printf( "Failed to load monster 3 texture!\n" );		success = false;	}
+		printf( "Failed to load stage 3 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[4].loadFromFile( "img/stage_background_4.bmp" ) ){
-		printf( "Failed to load monster 4 texture!\n" );		success = false;	}
+		printf( "Failed to load stage 4 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[5].loadFromFile( "img/stage_background_5.bmp" ) ){
-		printf( "Failed to load monster 5 texture!\n" );		success = false;	}
+		printf( "Failed to load stage 5 bg texture!\n" );		success = false;	}
+	if( !healthbar_texture.loadFromFile( "img/healthbar.bmp" ) ){
+		printf( "Failed to load healthbar texture!\n" );		success = false;	}
 
 //    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
 //    if( gFont == NULL )
@@ -415,20 +241,22 @@ int main( int argc, char* args[] )
 			SDL_Event e;		//Event handler
 			
 			student_class student;
-			
 			professor_class* professor;
 			professor = new professor_class [6];
-			for(int i=0;i<5;i++){
-				professor[i] = professor_class(i);
-				
-			}
+			for(int i=0;i<5;i++)	{ professor[i] = professor_class(i); }
 			professor[5] = professor_class(0);
+			healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
+			healthbar_class * professor_healthbar ;
+			professor_healthbar = new healthbar_class [6];
+			for(int i=0;i<5;i++)	{ professor_healthbar[i] = healthbar_class( block_x * 8 - 332+38 , 5 , professor[i] ); }
 			
-			SDL_Rect student_burn_rect = {90*2,90*5,90,90}; //burning icon position
-			SDL_Rect professor_burn_rect = {90*13,90,90,90}; //burning icon position
-			SDL_Rect student_stun_rect = {90*2,90*6,90,90};
-			SDL_Rect professor_stun_rect = {90*13,90*2,90,90}; //burning icon position
 			
+			
+			SDL_Rect student_burn_rect 		= { block_x*2  		, block_y*5	 	, block_x	 , block_y	 }; //student burning icon position
+			SDL_Rect student_stun_rect 		= { block_x*2  		, block_y*6		, block_x	 , block_y   };//student stunning icon position
+			SDL_Rect professor_burn_rect 	= { block_x*8 + 332, block_y*0	 	, 40		 , 40		 }; //professor burning icon position
+			SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0		, 40		 , 40	 	 }; //professor stunning icon position
+			SDL_Rect professor_pos_rect 	= { block_x*3  , block_y*0 + 40 , block_x*10 , block_y*4 };//professor on stage position
 			//While application is running
 			while( !quit )
 			{
@@ -471,14 +299,16 @@ int main( int argc, char* args[] )
 					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						stage_background_texture[stage].render(0,0);//Render texture to screen
-						if (student.burning){ burning_texture.render(student_burn_rect.x, student_burn_rect.y,&student_burn_rect); }
-						if (student.stunning){ stunning_texture.render(student_stun_rect.x, student_stun_rect.y, &student_stun_rect);	}
-						if (professor[stage].burning){ burning_texture.render(professor_burn_rect.x, professor_burn_rect.y, &professor_burn_rect); }
+						if (!student.burning){ burning_texture.render( student_burn_rect.x , student_burn_rect.y, &student_burn_rect ); }
+						if (!student.stunning){ stunning_texture.render( student_stun_rect.x , student_stun_rect.y, &student_stun_rect );	}
+						if (!professor[stage].burning){ burning_texture.render( professor_burn_rect.x , professor_burn_rect.y, &professor_burn_rect) ; }
+						if (!professor[stage].stunning){ stunning_texture.render( professor_stun_rect.x , professor_stun_rect.y, &professor_stun_rect ); }
+						
+						professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
 						
 						
-						
-						
-						
+						professor_healthbar[stage].render();	//render healthbar
+						student_healthbar.render();				//render healthbar
 						
 						SDL_RenderPresent( gRenderer );//Update screen
 						
