@@ -252,11 +252,11 @@ int main( int argc, char* args[] )
 			
 			
 			
-			SDL_Rect student_burn_rect 		= { block_x*2  		, block_y*5	 	, block_x	 , block_y	 }; //student burning icon position
-			SDL_Rect student_stun_rect 		= { block_x*2  		, block_y*6		, block_x	 , block_y   };//student stunning icon position
-			SDL_Rect professor_burn_rect 	= { block_x*8 + 332, block_y*0	 	, 40		 , 40		 }; //professor burning icon position
-			SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0		, 40		 , 40	 	 }; //professor stunning icon position
-			SDL_Rect professor_pos_rect 	= { block_x*3  , block_y*0 + 40 , block_x*10 , block_y*4 };//professor on stage position
+			SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
+			SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
+			SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
+			SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0				, 40		 , 40	 	 }; //professor stunning icon position
+			SDL_Rect professor_pos_rect 	= { block_x*3  		, block_y*0 + 40		, block_x*10 , block_y*4 };//professor on stage position
 			//While application is running
 			while( !quit )
 			{

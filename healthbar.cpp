@@ -74,6 +74,7 @@ void healthbar_class::update(student_class student){
 				hp[i] = false;
 			} 
 			render();
+			SDL_RenderPresent( gRenderer );//update screen
 			start--;
 			SDL_Delay(20);
 		}
@@ -87,6 +88,7 @@ void healthbar_class::update(student_class student){
 				hp[i] = false;
 			} 
 			render();
+			SDL_RenderPresent( gRenderer );//update screen
 			start++;
 			SDL_Delay(20);
 		}
