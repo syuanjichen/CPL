@@ -60,7 +60,7 @@ bool student_class::alive(){
 
 professor_class::professor_class(int a){
 	switch(a){
-		case 0:
+		case 1:
 			health_limit = 200;
 			difficulty = 1;
 			element = water;
@@ -77,7 +77,7 @@ professor_class::professor_class(int a){
 			ignite_counter = 0;
 			stun_counter = 0;
 			break;	
-		case 1:
+		case 2:
 			health_limit = 300;
 			difficulty = 2;
 			element = grass;
@@ -95,7 +95,7 @@ professor_class::professor_class(int a){
 			stun_counter = 0;
 			break;
 			
-		case 2:
+		case 3:
 			health_limit = 600;
 			difficulty = 3;
 			element = fire;
@@ -114,7 +114,7 @@ professor_class::professor_class(int a){
 			break;
 			
 			
-		case 3:
+		case 4:
 			health_limit = 1000;
 			difficulty = 4;
 			element = grass;
@@ -131,7 +131,7 @@ professor_class::professor_class(int a){
 			ignite_counter = 0;
 			stun_counter = 3;
 			break;
-		case 4:
+		case 0:
 			health_limit = 500;
 			difficulty = 10;
 			element = grass;
