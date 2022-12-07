@@ -29,10 +29,10 @@ void student_class::init(){
 	burning = false;
 	stunning = false;
 }
-int student_class::get_health_limit(){
+int character_class::get_health_limit(){
 	return health_limit;
 }
-void student_class::raise_health_limit(double a){
+void character_class::raise_health_limit(double a){
 	health_limit += (int)a;
 }
 void student_class::hurt(double a){
@@ -54,11 +54,6 @@ void student_class::hurt(double a){
 		shield -= damage;
 	}
 }
-bool student_class::alive(){
-	return living;
-}
-
-
 
 professor_class::professor_class(int a){
 	switch(a){
