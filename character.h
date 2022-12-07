@@ -70,7 +70,7 @@ class professor_class{					//class of enemy
 		professor_class(int a = 0);
 		attribute get_attribute() { return element; }	//return attribute
 		bool alive() { return living; }					//return alive or not 
-		
+		void do_effect( student_class student);
 		//void hurt(double);							//this is lee's job
 };
 

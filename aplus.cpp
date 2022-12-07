@@ -11,6 +11,7 @@
 #include "LTexture.h"
 #include "healthbar.h"
 
+
 using namespace std;
 const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
@@ -61,15 +62,11 @@ int probability(double hit_rate, double avoid_rate){		//function of hitting of n
 }
 
 
-
-//Mouse button sprites
-
-
-//Buttons objects
-
-//Texture wrapper class
-
-//The mouse button
+SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
+SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
+SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
+SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0				, 40		 , 40	 	 }; //professor stunning icon position
+SDL_Rect professor_pos_rect 	= { block_x*3  		, block_y*0 + 40		, block_x*10 , block_y*4 };//professor on stage position
 
 
 
@@ -136,6 +133,11 @@ LTexture professor_texture[6] ;			//texture of professor
 LTexture stage_background_texture[6];	//texture of battle backgrounds
 LTexture healthbar_texture ;			//texture of healthbar
 
+student_class student;
+professor_class professor[6];
+
+healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
+healthbar_class professor_healthbar[6] ;
 
 bool loadMedia()
 {
@@ -240,23 +242,12 @@ int main( int argc, char* args[] )
 
 			SDL_Event e;		//Event handler
 			
-			student_class student;
-			professor_class* professor;
-			professor = new professor_class [6];
 			for(int i=0;i<5;i++)	{ professor[i] = professor_class(i); }
 			professor[5] = professor_class(0);
-			healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
-			healthbar_class * professor_healthbar ;
-			professor_healthbar = new healthbar_class [6];
+			
 			for(int i=0;i<5;i++)	{ professor_healthbar[i] = healthbar_class( block_x * 8 - 332+38 , 5 , professor[i] ); }
 			
 			
-			
-			SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
-			SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
-			SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
-			SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0				, 40		 , 40	 	 }; //professor stunning icon position
-			SDL_Rect professor_pos_rect 	= { block_x*3  		, block_y*0 + 40		, block_x*10 , block_y*4 };//professor on stage position
 			//While application is running
 			while( !quit )
 			{
@@ -299,10 +290,10 @@ int main( int argc, char* args[] )
 					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						stage_background_texture[stage].render(0,0);//Render texture to screen
-						if (!student.burning){ burning_texture.render( student_burn_rect.x , student_burn_rect.y, &student_burn_rect ); }
-						if (!student.stunning){ stunning_texture.render( student_stun_rect.x , student_stun_rect.y, &student_stun_rect );	}
-						if (!professor[stage].burning){ burning_texture.render( professor_burn_rect.x , professor_burn_rect.y, &professor_burn_rect) ; }
-						if (!professor[stage].stunning){ stunning_texture.render( professor_stun_rect.x , professor_stun_rect.y, &professor_stun_rect ); }
+						if (student.burning){ burning_texture.render( student_burn_rect.x , student_burn_rect.y, &student_burn_rect ); }
+						if (student.stunning){ stunning_texture.render( student_stun_rect.x , student_stun_rect.y, &student_stun_rect );	}
+						if (professor[stage].burning){ burning_texture.render( professor_burn_rect.x , professor_burn_rect.y, &professor_burn_rect) ; }
+						if (professor[stage].stunning){ stunning_texture.render( professor_stun_rect.x , professor_stun_rect.y, &professor_stun_rect ); }
 						
 						professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
 						
@@ -331,62 +322,11 @@ int main( int argc, char* args[] )
 							
 							if(!professor[stage].stunning){
 								student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
-
-								switch ( professor[ stage ].special ){
-									case health_to_attack:
-									if (student.burning == true)	student.burning = false;
-									if (student.stunning == true)	student.stunning = false;
-									break;
-									
-									
-									case swifty:
-									if (student.burning == true)	student.burning = false;
-									if (student.stunning == true)	student.stunning = false;
-									break;
-									
-									
-									case armored:
-									if (student.burning == true)	student.burning = false;
-									if (student.stunning == true)	student.stunning = false;
-									break;
-									
-									
-									case stun:
-									if(student.stunning == false && professor[stage].stun_counter >= 6){
-										student.stunning == true;
-										professor[stage].stun_counter = 0;
-									}
-									else{
-										if(professor[stage].stun_counter >= 2)
-											professor[stage].stun_counter = 0;
-										else
-											professor[stage].stun_counter +=1;
-										if (student.stunning == true){ student.stunning = false;}
-									}
-									
-									if (student.burning == true){ student.burning = false;}
-									break;
-									
-										
-									case firing:
-									if(student.burning == false && professor[stage].ignite_counter >= 5){
-										student.burning == true;
-										professor[stage].ignite_counter = 0;
-									}
-									else{
-										if(professor[stage].ignite_counter >= 5)
-											professor[stage].ignite_counter = 0;
-										else
-											professor[stage].ignite_counter +=1;
-									}
-									if(student.stunning == true){ student.stunning = false;}
-									break;
-									
-								}
-								
+								professor[stage].do_effect(student);
 							}
-							
+							student_healthbar.update(student);
 							if( student.burning == true){ student.hurt(3); }
+							student_healthbar.update(student);
 							if( student.alive() == false ){	state = no_school; }
 						}
 					

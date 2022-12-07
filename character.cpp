@@ -1,5 +1,7 @@
 #include "character.h"
 
+
+
 student_class::student_class(){
 	health_limit = 100;
 	living = true;
@@ -150,4 +152,52 @@ professor_class::professor_class(int a){
 			break;
 	}
 	
+}
+void professor_class::do_effect(student_class student){
+	switch ( special ){
+		case health_to_attack:
+		
+		break;
+
+		case swifty:
+		
+		break;
+		
+		case armored:
+		
+		break;
+		
+		
+		case stun:
+		if(student.stunning == false && this->stun_counter >= 2){
+			student.stunning = true;
+			this->stun_counter = 0;
+		}
+		else{
+			if(this->stun_counter >= 2)
+				this->stun_counter = 0;
+			else{
+				this->stun_counter +=1;
+				if (student.stunning == true){ student.stunning = false;}
+			}
+		}
+		
+		
+		break;
+		
+		case firing:
+		if(student.burning == false && this->ignite_counter >= 5){
+			student.burning = true;
+			this->ignite_counter = 0;
+		}
+		else{
+			if(this->ignite_counter >= 5)
+				this->ignite_counter = 0;
+			else
+				this->ignite_counter +=1;
+		}
+		
+		break;
+		
+	}
 }
