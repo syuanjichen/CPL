@@ -10,6 +10,8 @@
 #include "character.h"
 #include "LTexture.h"
 #include "healthbar.h"
+#include "cards.h" 
+
 
 
 using namespace std;
