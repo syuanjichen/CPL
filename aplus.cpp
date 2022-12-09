@@ -46,12 +46,18 @@ SDL_Renderer* gRenderer = NULL;//The window renderer
 SDL_Surface* gScreenSurface = NULL;
 
 TTF_Font *conti_font = NULL;
+
 TTF_Font *gFont = NULL;
 
 int probability(double hit_rate, double avoid_rate);
+
 void papertable_render();
+
 void battlescene_render();
+
 void continue_button_render();
+
+void background_texture_render();
 
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
@@ -63,7 +69,7 @@ SDL_Rect paper_1_rect			= {	35				, 15					, 60		 , 60		 };
 SDL_Rect paper_2_rect			= {	105				, 15					, 60		 , 60		 };
 SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 
-SDL_Color continue_button_color = {0,0,0};
+SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
 
 LTexture start_texture ;  				//texture of start scene
 LTexture explanation_texture ;			//texture of explanation scene
@@ -144,7 +150,7 @@ bool init()
 			printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
 			success = false;
 		}
-		conti_font = TTF_OpenFont( "img/Golden_Age_Shad.ttf", 28 );
+		conti_font = TTF_OpenFont( "img/Golden_Age_Shad.ttf", 48 );
 	    if( conti_font == NULL )
 		{
 			printf( "Failed to load continue font! SDL_ttf Error: %s\n", TTF_GetError() );
@@ -203,7 +209,7 @@ bool loadMedia()
 		printf( "Failed to load paper1 texture!\n" );		success = false;	}
 	if( !paper_texture[2].loadFromFile( "img/testpaper_1.bmp" ) ){
 		printf( "Failed to load paper2 texture!\n" );		success = false;	}
-	if( !continue_button.loadFromRenderedText( "--- Press Space To Continue ---" ,continue_button_color ) ){
+	if( !continue_button.loadFromRenderedText_goldenage( "--- Press Space To Continue ---" ,continue_button_color ) ){
 		printf( "Failed to load continue button texture!\n" );		success = false;	}
 		
     
@@ -275,7 +281,8 @@ int main( int argc, char* args[] )
 			//While application is running
 			while( !quit )
 			{
-				
+				background_texture_render();	//render image in this function
+				SDL_RenderPresent( gRenderer );//update screen
 				//Handle events on queue
 				while( SDL_PollEvent( &e ) != 0 )
 				{
@@ -285,9 +292,6 @@ int main( int argc, char* args[] )
 						quit = true;
 					}
 					else if(state == start){
-						start_texture.render(0,0);//Render texture to screen
-						SDL_RenderPresent( gRenderer );//update screen
-						
 						if(e.type == SDL_KEYDOWN){
 							
 							switch( e.key.keysym.sym )
@@ -299,10 +303,6 @@ int main( int argc, char* args[] )
 						}
 					}
 					else if (state == explanation){
-						explanation_texture.render(0,0);//Render texture to screen
-						//here to render the explanation words 
-						//or put the words in the explanation_texture
-						SDL_RenderPresent( gRenderer );//Update screen
 						if(e.type == SDL_KEYDOWN){
 							switch( e.key.keysym.sym )
                    	    	{
@@ -313,9 +313,6 @@ int main( int argc, char* args[] )
 						}
 					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
-						
-						battlescene_render();
-						SDL_RenderPresent( gRenderer );//Update screen
 						
 						if ( state == enter_stage ){
 							//tell player what ability that enemy posesses
@@ -402,5 +399,43 @@ void battlescene_render(){
 }
 
 void continue_button_render(){
-	
+	static double continue_button_iterator = 0;
+	double intransparancy = 128 + 127 * sin(continue_button_iterator);
+	continue_button.setBlendMode(SDL_BLENDMODE_BLEND);
+	continue_button.setAlpha( intransparancy );
+	SDL_Rect pos = {SCREEN_WIDTH/2 - continue_button.getWidth() / 2 , 710,continue_button.getWidth(),continue_button.getHeight()};
+	continue_button.render(pos.x, pos.y,&pos);
+	continue_button_iterator += 0.02;
+}
+
+void background_texture_render(){
+	if( state == start ){
+		start_texture.render(0,0);//Render texture to screen
+		continue_button_render();
+		
+	}
+	else if( state == explanation ){
+		explanation_texture.render(0,0);//Render texture to screen
+		
+		//here to render the explanation words 
+		//or put the words in the explanation_texture
+		continue_button_render();
+		
+	}
+	else if (state == enter_stage || state == student_attacking || state == professor_attacking){
+		battlescene_render();
+		
+	}
+	else if(state == gatcha){
+		//
+	}
+	else if(state == no_school){
+		//wasted animation
+	}
+	else if(state == get_f){
+		get_f_texture.render(0,0);
+	}
+	else if(state == get_aplus){
+		
+	}
 }
