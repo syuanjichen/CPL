@@ -133,13 +133,13 @@ bool LTexture::loadFromRenderedText_goldenage( std::string textureText, SDL_Colo
 	return mTexture != NULL;
 }
 
-bool LTexture::loadFromRenderedText_chinese( std::string textureText, SDL_Color textColor )
+bool LTexture::loadFromRenderedText_chinese( Uint16* text, SDL_Color textColor )
 {
 	//Get rid of preexisting texture
 	free();
 	
 	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Solid( chinesefont, textureText.c_str(), textColor );
+	SDL_Surface* textSurface = TTF_RenderUNICODE_Solid( chinesefont, text, textColor );
 	if( textSurface == NULL )
 	{
 		printf( "Unable to render chinese text surface! SDL_ttf Error: %s\n", TTF_GetError() );
