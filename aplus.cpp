@@ -49,6 +49,8 @@ TTF_Font *conti_font = NULL;
 
 TTF_Font *gFont = NULL;
 
+TTF_Font *chinesefont = NULL;
+
 int probability(double hit_rate, double avoid_rate);
 
 void papertable_render();
@@ -83,6 +85,7 @@ LTexture healthbar_texture ;			//texture of healthbar
 LTexture paper_status_table_texture ;
 LTexture paper_texture[3] ;
 LTexture continue_button ;
+
 
 student_class student;
 professor_class professor[6];
@@ -154,6 +157,12 @@ bool init()
 	    if( conti_font == NULL )
 		{
 			printf( "Failed to load continue font! SDL_ttf Error: %s\n", TTF_GetError() );
+			success = false;
+		}
+		chinesefont = TTF_OpenFont( "img/Pixel.ttf", 48 );
+		if( chinesefont == NULL )
+		{
+			printf( "Failed to load chinese font! SDL_ttf Error: %s\n", TTF_GetError() );
 			success = false;
 		}
 	}
@@ -236,6 +245,9 @@ void close()
 	gFont = NULL;
 	TTF_CloseFont( conti_font );
 	conti_font = NULL;
+	TTF_CloseFont( chinesefont );
+	chinesefont = NULL;
+	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -293,9 +305,7 @@ int main( int argc, char* args[] )
 					}
 					else if(state == start){
 						if(e.type == SDL_KEYDOWN){
-							
-							switch( e.key.keysym.sym )
-                	        {
+							switch( e.key.keysym.sym ){
                 	    	    case SDLK_SPACE:
                 	        	    state = explanation;
                 	        		break;
@@ -304,8 +314,7 @@ int main( int argc, char* args[] )
 					}
 					else if (state == explanation){
 						if(e.type == SDL_KEYDOWN){
-							switch( e.key.keysym.sym )
-                   	    	{
+							switch( e.key.keysym.sym ){
                    	 	    case SDLK_SPACE:
                    	     	    state = enter_stage;
                    	     	    break;
