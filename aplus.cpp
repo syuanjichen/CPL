@@ -85,7 +85,7 @@ LTexture healthbar_texture ;			//texture of healthbar
 LTexture paper_status_table_texture ;
 LTexture paper_texture[3] ;
 LTexture continue_button ;
-
+LTexture chinese_test_texture;
 
 student_class student;
 professor_class professor[6];
@@ -93,6 +93,7 @@ professor_class professor[6];
 healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
 healthbar_class professor_healthbar[6] ;
 
+Uint16 chinese_test[] = {0x65e9,0x5b89,0x4f60,0x597d};	
 
 bool init()
 {
@@ -220,7 +221,8 @@ bool loadMedia()
 		printf( "Failed to load paper2 texture!\n" );		success = false;	}
 	if( !continue_button.loadFromRenderedText_goldenage( "--- Press Space To Continue ---" ,continue_button_color ) ){
 		printf( "Failed to load continue button texture!\n" );		success = false;	}
-		
+	if( !chinese_test_texture.loadFromRenderedText_chinese( chinese_test ,continue_button_color ) ){
+		printf( "Failed to load good_morning_chinese texture!\n" );		success = false;	}
     
 	return success;
 }
