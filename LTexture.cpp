@@ -65,7 +65,7 @@ bool LTexture::loadFromFile( std::string path )
 }
 
 #if defined(SDL_TTF_MAJOR_VERSION)
-bool LTexture::loadFromRenderedText( std::string textureText ,SDL_Color textColor )
+bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
 {
 	//Get rid of preexisting texture
 	free();
@@ -103,7 +103,7 @@ bool LTexture::loadFromRenderedText_goldenage( std::string textureText, SDL_Colo
 {
 	//Get rid of preexisting texture
 	free();
-
+	
 	//Render text surface
 	SDL_Surface* textSurface = TTF_RenderText_Solid( conti_font, textureText.c_str(), textColor );
 	if( textSurface == NULL )

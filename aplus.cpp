@@ -41,18 +41,12 @@ void close();				  //Frees media and shuts down SDL
 
 SDL_Window* gWindow = NULL;	  //The window we'll be rendering to
 
-#ifndef _GRENDERER
-#define _GRENDERER
 SDL_Renderer* gRenderer = NULL;//The window renderer
-#endif
 
 SDL_Surface* gScreenSurface = NULL;
 
-#ifndef _GFONT
-#define _GFONT 
 TTF_Font *conti_font = NULL;
 TTF_Font *gFont = NULL;
-#endif
 
 int probability(double hit_rate, double avoid_rate);
 void papertable_render();
@@ -69,7 +63,27 @@ SDL_Rect paper_1_rect			= {	35				, 15					, 60		 , 60		 };
 SDL_Rect paper_2_rect			= {	105				, 15					, 60		 , 60		 };
 SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 
-SDL_Color continue_button_color = {0x00,0xFF,0xFF};
+SDL_Color continue_button_color = {0,0,0};
+
+LTexture start_texture ;  				//texture of start scene
+LTexture explanation_texture ;			//texture of explanation scene
+LTexture burning_texture ;				//texture of burning small icon
+LTexture stunning_texture ; 			//texture of stunning small icon
+LTexture claw_texture ;					//texture of claw(attack of professor)
+LTexture get_f_texture ;				//texture of getting f end
+LTexture professor_texture[6] ;			//texture of professor
+LTexture stage_background_texture[6];	//texture of battle backgrounds
+LTexture healthbar_texture ;			//texture of healthbar
+LTexture paper_status_table_texture ;
+LTexture paper_texture[3] ;
+LTexture continue_button ;
+
+student_class student;
+professor_class professor[6];
+
+healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
+healthbar_class professor_healthbar[6] ;
+
 
 bool init()
 {
@@ -96,7 +110,7 @@ bool init()
 	}
 	
 	//Create renderer for window
-	gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED /*| SDL_RENDERER_PRESENTVSYNC*/ );
+	gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
 	if( gRenderer == NULL )
 	{
 		printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -123,30 +137,24 @@ bool init()
 	    printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
 	    success = false;
 	}
+	else{
+		gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
+	    if( gFont == NULL )
+		{
+			printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+			success = false;
+		}
+		conti_font = TTF_OpenFont( "img/Golden_Age_Shad.ttf", 28 );
+	    if( conti_font == NULL )
+		{
+			printf( "Failed to load continue font! SDL_ttf Error: %s\n", TTF_GetError() );
+			success = false;
+		}
+	}
 	
 
 	return success;
 }
-
-
-LTexture start_texture ;  				//texture of start scene
-LTexture explanation_texture ;			//texture of explanation scene
-LTexture burning_texture ;				//texture of burning small icon
-LTexture stunning_texture ; 			//texture of stunning small icon
-LTexture claw_texture ;					//texture of claw(attack of professor)
-LTexture get_f_texture ;				//texture of getting f end
-LTexture professor_texture[6] ;			//texture of professor
-LTexture stage_background_texture[6];	//texture of battle backgrounds
-LTexture healthbar_texture ;			//texture of healthbar
-LTexture paper_status_table_texture ;
-LTexture paper_texture[3] ;
-LTexture continue_button ;
-
-student_class student;
-professor_class professor[6];
-
-healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
-healthbar_class professor_healthbar[6] ;
 
 bool loadMedia()
 {
@@ -195,21 +203,10 @@ bool loadMedia()
 		printf( "Failed to load paper1 texture!\n" );		success = false;	}
 	if( !paper_texture[2].loadFromFile( "img/testpaper_1.bmp" ) ){
 		printf( "Failed to load paper2 texture!\n" );		success = false;	}
-	if( !continue_button.loadFromRenderedText( "--- Press Space To Continue ---",continue_button_color ) ){
+	if( !continue_button.loadFromRenderedText( "--- Press Space To Continue ---" ,continue_button_color ) ){
 		printf( "Failed to load continue button texture!\n" );		success = false;	}
 		
-    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
-    if( gFont == NULL )
-	{
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-		success = false;
-	}
-	conti_font = TTF_OpenFont( "img/Golden_Age_Shad.ttf", 28 );
-    if( conti_font == NULL )
-	{
-		printf( "Failed to load continue font! SDL_ttf Error: %s\n", TTF_GetError() );
-		success = false;
-	}
+    
 	return success;
 }
 
