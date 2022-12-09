@@ -30,6 +30,7 @@ class LTexture
 		#if defined(SDL_TTF_MAJOR_VERSION)
 		//Creates image from font string
 		bool loadFromRenderedText( std::string textureText, SDL_Color textColor );
+		bool loadFromRenderedText_goldenage( std::string textureText, SDL_Color textColor );
 		#endif
 		
 		//Deallocates texture

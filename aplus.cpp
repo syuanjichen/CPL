@@ -11,15 +11,13 @@
 #include "LTexture.h"
 #include "healthbar.h"
 #include "cards.h" 
-
-
-
 using namespace std;
 const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
 
 int block_x = SCREEN_WIDTH/16;
 int block_y = SCREEN_HEIGHT/9;
+bool getpaper[3] = {false};
 
 enum game_state {				//game states
 	start,						//just entered game
@@ -52,25 +50,26 @@ SDL_Surface* gScreenSurface = NULL;
 
 #ifndef _GFONT
 #define _GFONT 
+TTF_Font *conti_font = NULL;
 TTF_Font *gFont = NULL;
 #endif
 
-int probability(double hit_rate, double avoid_rate){		//function of hitting of not
-	srand(time(NULL));
-	double rate = pow(hit_rate * (1-avoid_rate),0.5);
-	rate *= 100;
-	if( (rand()%100+1) < rate )	return 1 ;
-	else						return 0 ;
-}
-
+int probability(double hit_rate, double avoid_rate);
+void papertable_render();
+void battlescene_render();
+void continue_button_render();
 
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
 SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0				, 40		 , 40	 	 }; //professor stunning icon position
 SDL_Rect professor_pos_rect 	= { block_x*3  		, block_y*0 + 40		, block_x*10 , block_y*4 };//professor on stage position
+SDL_Rect paper_table_rect		= {	0				, 0						, 270		 , 90		 };
+SDL_Rect paper_1_rect			= {	35				, 15					, 60		 , 60		 };
+SDL_Rect paper_2_rect			= {	105				, 15					, 60		 , 60		 };
+SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 
-
+SDL_Color continue_button_color = {0x00,0xFF,0xFF};
 
 bool init()
 {
@@ -119,6 +118,11 @@ bool init()
 		printf( "gScreenSurface could not be created! SDL Error: %s\n", SDL_GetError() );
 		success = false;
 	}
+	if( TTF_Init() == -1 )
+	{
+	    printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+	    success = false;
+	}
 	
 
 	return success;
@@ -134,6 +138,9 @@ LTexture get_f_texture ;				//texture of getting f end
 LTexture professor_texture[6] ;			//texture of professor
 LTexture stage_background_texture[6];	//texture of battle backgrounds
 LTexture healthbar_texture ;			//texture of healthbar
+LTexture paper_status_table_texture ;
+LTexture paper_texture[3] ;
+LTexture continue_button ;
 
 student_class student;
 professor_class professor[6];
@@ -180,13 +187,29 @@ bool loadMedia()
 		printf( "Failed to load stage 5 bg texture!\n" );		success = false;	}
 	if( !healthbar_texture.loadFromFile( "img/healthbar.bmp" ) ){
 		printf( "Failed to load healthbar texture!\n" );		success = false;	}
-
-//    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
-//    if( gFont == NULL )
-//	{
-//		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-//		success = false;
-//	}
+	if( !paper_status_table_texture.loadFromFile( "img/testpaper_background.bmp" ) ){
+		printf( "Failed to load paper table texture!\n" );		success = false;	}
+	if( !paper_texture[0].loadFromFile( "img/testpaper_1.bmp" ) ){
+		printf( "Failed to load paper0 texture!\n" );		success = false;	}
+	if( !paper_texture[1].loadFromFile( "img/testpaper_1.bmp" ) ){
+		printf( "Failed to load paper1 texture!\n" );		success = false;	}
+	if( !paper_texture[2].loadFromFile( "img/testpaper_1.bmp" ) ){
+		printf( "Failed to load paper2 texture!\n" );		success = false;	}
+	if( !continue_button.loadFromRenderedText( "--- Press Space To Continue ---",continue_button_color ) ){
+		printf( "Failed to load continue button texture!\n" );		success = false;	}
+		
+    gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
+    if( gFont == NULL )
+	{
+		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		success = false;
+	}
+	conti_font = TTF_OpenFont( "img/Golden_Age_Shad.ttf", 28 );
+    if( conti_font == NULL )
+	{
+		printf( "Failed to load continue font! SDL_ttf Error: %s\n", TTF_GetError() );
+		success = false;
+	}
 	return success;
 }
 
@@ -203,11 +226,13 @@ void close()
 		stage_background_texture[i].free();
 		professor_texture[i].free();
 	}
-	
+	paper_status_table_texture.free();
+	for(int i=0;i<3;i++)	paper_texture[i].free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
-	
+	TTF_CloseFont( conti_font );
+	conti_font = NULL;
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -291,18 +316,8 @@ int main( int argc, char* args[] )
 						}
 					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
-						stage_background_texture[stage].render(0,0);//Render texture to screen
-						if (student.burning){ burning_texture.render( student_burn_rect.x , student_burn_rect.y, &student_burn_rect ); }
-						if (student.stunning){ stunning_texture.render( student_stun_rect.x , student_stun_rect.y, &student_stun_rect );	}
-						if (professor[stage].burning){ burning_texture.render( professor_burn_rect.x , professor_burn_rect.y, &professor_burn_rect) ; }
-						if (professor[stage].stunning){ stunning_texture.render( professor_stun_rect.x , professor_stun_rect.y, &professor_stun_rect ); }
 						
-						professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
-						
-						
-						professor_healthbar[stage].render();	//render healthbar
-						student_healthbar.render();				//render healthbar
-						
+						battlescene_render();
 						SDL_RenderPresent( gRenderer );//Update screen
 						
 						if ( state == enter_stage ){
@@ -358,4 +373,37 @@ int main( int argc, char* args[] )
 	close();
 	
 	return 0;
+}
+
+int probability(double hit_rate, double avoid_rate){		//function of hitting of not
+	srand(time(NULL));
+	double rate = pow(hit_rate * (1-avoid_rate),0.5);
+	rate *= 100;
+	if( (rand()%100+1) < rate )	return 1 ;
+	else						return 0 ;
+}
+
+void papertable_render(){
+	paper_status_table_texture.render(0,0,&paper_table_rect);
+	if(getpaper[0])	paper_texture[0].render(35,15,&paper_1_rect);
+	if(getpaper[1])	paper_texture[1].render(105,15,&paper_2_rect);
+	if(getpaper[2])	paper_texture[2].render(175,15,&paper_3_rect);
+}
+
+void battlescene_render(){
+	stage_background_texture[stage].render(0,0);//Render texture to screen
+	if (student.burning){ burning_texture.render( student_burn_rect.x , student_burn_rect.y, &student_burn_rect ); }
+	if (student.stunning){ stunning_texture.render( student_stun_rect.x , student_stun_rect.y, &student_stun_rect );	}
+	if (professor[stage].burning){ burning_texture.render( professor_burn_rect.x , professor_burn_rect.y, &professor_burn_rect) ; }
+	if (professor[stage].stunning){ stunning_texture.render( professor_stun_rect.x , professor_stun_rect.y, &professor_stun_rect ); }
+	
+	professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
+	
+	papertable_render();
+	professor_healthbar[stage].render();	//render healthbar
+	student_healthbar.render();				//render healthbar
+}
+
+void continue_button_render(){
+	
 }
