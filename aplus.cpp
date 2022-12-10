@@ -11,10 +11,10 @@
 #include "LTexture.h"
 #include "healthbar.h"
 #include "cards.h" 
+#define PI 3.14159265358979323846
 using namespace std;
 const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
-
 int block_x = SCREEN_WIDTH/16;
 int block_y = SCREEN_HEIGHT/9;
 bool getpaper[3] = {false};
@@ -60,9 +60,17 @@ void battlescene_render();
 
 void continue_button_render();
 
+void quitgame_button_render();
+
 void background_texture_render();
 
 void gatcha_animation(int);	//input the number of drawn testpaper(0, 1, 2)
+
+void get_f_script();
+
+void get_aplus_script();
+
+void prof_attack_animation();
 
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
@@ -75,6 +83,8 @@ SDL_Rect paper_2_rect			= {	105				, 15					, 60		 , 60		 };
 SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 
 SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
+SDL_Color get_f_text_color = {0xFF,0xFF,0xFF};
+SDL_Color quitgame_button_color = {0x00,0x00,0x00};
 
 LTexture start_texture ;  				//texture of start scene
 LTexture explanation_texture ;			//texture of explanation scene
@@ -88,11 +98,16 @@ LTexture healthbar_texture ;			//texture of healthbar
 LTexture paper_status_table_texture ;
 LTexture paper_texture[3] ;
 LTexture continue_button ;
+LTexture quitgame_button ;
 LTexture chinese_test_texture;
+LTexture get_f_subtitle[5];
 LTexture testpaper_postman_walk;
 LTexture testpaper_postman_jump;
 LTexture block_nothit;
 LTexture block_hit;
+LTexture get_aplus_texture;
+LTexture get_aplus_subtitle[2];
+LTexture magicball; 
 
 student_class student;
 professor_class professor[6];
@@ -101,6 +116,13 @@ healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
 healthbar_class professor_healthbar[6] ;
 
 Uint16 chinese_test[] = {0x65e9,0x5b89,0x4f60,0x597d};	
+Uint16 get_f_text_0[] = {0x3002,0x3002,0x3002};
+Uint16 get_f_text_1[] = {0x6211,0x76e1,0x529b,0x4e86,0xff0c,0x6211,0x76e1,0x5168,0x529b,0x4e86,0x3002};
+Uint16 get_f_text_2[] = {0x5982,0x679c,0x628a,0x6642,0x9593,0x62ff,0x53bb,0x8907,0x7fd2,0x7684,0x8a71,0xff0c,0x8aaa,0x4e0d,0x5b9a,0x9084,0x6709,0x6a5f,0x6703,0x901a,0x904e,0x8003,0x8a66,0x3002};
+Uint16 get_f_text_3[] = {0x65e9,0x77e5,0x9053,0x5c31,0x4e0d,0x8a72,0x6d6a,0x8cbb,0x6642,0x9593,0x5728,0x9019,0x5b87,0x5b99,0x7cde,0x904a,0x4e0a,0x4e86,0x3002};
+Uint16 get_f_text_4[] = {0x4f86,0x751f,0x9084,0x60f3,0x62ff,0x66f8,0x5377,0x734e,0x554a,0x3002};
+Uint16 get_aplus_text_0[] = {0x7d93,0x6b77,0x4e86,0x5343,0x8f9b,0x842c,0x82e6,0xff0c,0x6211,0x7d42,0x65bc,0x7372,0x5f97,0x4e86,0x81f3,0x9ad8,0x5c0a,0x5bf6,0x300e,0x66f8,0x5377,0x734e,0x300f,0x3002};
+Uint16 get_aplus_text_1[] = {0x6211,0x8214};
 
 bool init()
 {
@@ -196,6 +218,8 @@ bool loadMedia()
 		printf( "Failed to load claw texture!\n" );				success = false;	}
 	if( !get_f_texture.loadFromFile( "img/get_f.bmp" ) ){
 		printf( "Failed to load get_f texture!\n" );			success = false;	}
+	if( !get_aplus_texture.loadFromFile( "img/get_aplus.bmp" ) ){
+		printf( "Failed to load get_aplus texture!\n" );		success = false;	}
 	if( !professor_texture[1].loadFromFile( "img/monster_1.bmp" ) ){
 		printf( "Failed to load monster 1 texture!\n" );		success = false;	}
 	if( !professor_texture[2].loadFromFile( "img/monster_2.bmp" ) ){
@@ -221,24 +245,41 @@ bool loadMedia()
 	if( !paper_status_table_texture.loadFromFile( "img/testpaper_background.bmp" ) ){
 		printf( "Failed to load paper table texture!\n" );		success = false;	}
 	if( !paper_texture[0].loadFromFile( "img/testpaper_1.bmp" ) ){
-		printf( "Failed to load paper0 texture!\n" );		success = false;	}
+		printf( "Failed to load paper0 texture!\n" );			success = false;	}
 	if( !paper_texture[1].loadFromFile( "img/testpaper_2.bmp" ) ){
-		printf( "Failed to load paper1 texture!\n" );		success = false;	}
+		printf( "Failed to load paper1 texture!\n" );			success = false;	}
 	if( !paper_texture[2].loadFromFile( "img/testpaper_3.bmp" ) ){
-		printf( "Failed to load paper2 texture!\n" );		success = false;	}
+		printf( "Failed to load paper2 texture!\n" );			success = false;	}
 	if( !continue_button.loadFromRenderedText_goldenage( "--- Press Space To Continue ---" ,continue_button_color ) ){
 		printf( "Failed to load continue button texture!\n" );		success = false;	}
+	if( !quitgame_button.loadFromRenderedText_goldenage( "--- Press Space To Quit Playing ---" ,quitgame_button_color ) ){
+		printf( "Failed to load quitgame button texture!\n" );		success = false;	}
 	if( !chinese_test_texture.loadFromRenderedText_chinese( chinese_test ,continue_button_color ) ){
 		printf( "Failed to load good_morning_chinese texture!\n" );		success = false;	}
     if( !testpaper_postman_walk.loadFromFile( "img/testpaper_postman_walk.bmp"  ) ){
-		printf( "Failed to load testpaper_postman_walk texture!\n" );		success = false;	}
+		printf( "Failed to load testpaper_postman_walk texture!\n" );	success = false;	}
 	if( !testpaper_postman_jump.loadFromFile( "img/testpaper_postman_jump.bmp"  ) ){
-		printf( "Failed to load testpaper_postman_jump texture!\n" );		success = false;	}
+		printf( "Failed to load testpaper_postman_jump texture!\n" );	success = false;	}
 	if( !block_nothit.loadFromFile( "img/block_nothit.bmp"  ) ){
 		printf( "Failed to load block_nothit texture!\n" );		success = false;	}
 	if( !block_hit.loadFromFile( "img/block_hit.bmp"  ) ){
 		printf( "Failed to load block_hit texture!\n" );		success = false;	}
-
+	if( !get_f_subtitle[0].loadFromRenderedText_chinese( get_f_text_0 ,get_f_text_color ) ){
+		printf( "Failed to load get_f_text_0 texture!\n" );		success = false;	}
+	if( !get_f_subtitle[1].loadFromRenderedText_chinese( get_f_text_1 ,get_f_text_color ) ){
+		printf( "Failed to load get_f_text_1 texture!\n" );		success = false;	}
+	if( !get_f_subtitle[2].loadFromRenderedText_chinese( get_f_text_2 ,get_f_text_color ) ){
+		printf( "Failed to load get_f_text_2 texture!\n" );		success = false;	}
+	if( !get_f_subtitle[3].loadFromRenderedText_chinese( get_f_text_3 ,get_f_text_color ) ){
+		printf( "Failed to load get_f_text_3 texture!\n" );		success = false;	}
+	if( !get_f_subtitle[4].loadFromRenderedText_chinese( get_f_text_4 ,get_f_text_color ) ){
+		printf( "Failed to load get_f_text_4 texture!\n" );		success = false;	}
+	if( !get_aplus_subtitle[0].loadFromRenderedText_chinese( get_aplus_text_0 ,get_f_text_color ) ){
+		printf( "Failed to load get_aplus_text_0 texture!\n" );	success = false;	}
+	if( !get_aplus_subtitle[1].loadFromRenderedText_chinese( get_aplus_text_1 ,get_f_text_color ) ){
+		printf( "Failed to load get_aplus_text_1 texture!\n" );	success = false;	}
+	if( !magicball.loadFromFile( "img/magicball.bmp"  ) ){
+		printf( "Failed to load magicball texture!\n" );		success = false;	}	
 	return success;
 }
 
@@ -257,10 +298,16 @@ void close()
 	}
 	paper_status_table_texture.free();
 	for(int i=0;i<3;i++)	paper_texture[i].free();
+	continue_button.free();
+	quitgame_button.free();
 	testpaper_postman_walk.free();
 	testpaper_postman_jump.free();
 	block_nothit.free();
 	block_hit.free();
+	for(int i=0;i<5;i++)	get_f_subtitle[i].free();
+	for(int i=0;i<2;i++)	get_aplus_subtitle[i].free();
+	get_aplus_texture.free();
+	magicball.free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -344,6 +391,8 @@ int main( int argc, char* args[] )
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						
 						if ( state == enter_stage ){
+							student.burning = false;			student.stunning = false;
+							professor[stage].burning = false;	professor[stage].stunning = false;
 							//tell player what ability that enemy posesses
 							
 							
@@ -361,13 +410,23 @@ int main( int argc, char* args[] )
 						else if( state == professor_attacking ){
 							
 							if(!professor[stage].stunning){
+								prof_attack_animation();
 								student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
 								professor[stage].do_effect(student);
 							}
+							SDL_Delay(300);
 							student_healthbar.update(student);
-							if( student.burning == true){ student.hurt(3); }
-							student_healthbar.update(student);
-							if( student.alive() == false ){	state = no_school; }
+							SDL_Delay(300);
+							if( student.burning == true){ student.hurt(3); }{
+								student_healthbar.update(student);
+								SDL_Delay(300);
+							}
+							if( student.alive() == false ){	
+								state = no_school; 
+							}
+							else{
+								state = student_attacking;
+							}
 						}
 					
 						
@@ -396,10 +455,18 @@ int main( int argc, char* args[] )
 						//wasted animation
 					}
 					else if(state == get_f){
-						//wasted animation
+						switch( e.key.keysym.sym ){
+                   	 	    case SDLK_SPACE:
+                   	     	    quit = true;
+                   	     	    break;
+                   	    }
 					}
 					else if(state == get_aplus){
-						
+						switch( e.key.keysym.sym ){
+                   	 	    case SDLK_SPACE:
+                   	     	    quit = true;
+                   	     	    break;
+                   	    }
 					}
 					
 				}
@@ -454,6 +521,16 @@ void continue_button_render(){
 	continue_button_iterator += 0.02;
 }
 
+void quitgame_button_render(){
+	static double quitgame_button_iterator = 0;
+	double intransparancy = 128 + 127 * sin(quitgame_button_iterator);
+	quitgame_button.setBlendMode(SDL_BLENDMODE_BLEND);
+	quitgame_button.setAlpha( intransparancy );
+	SDL_Rect pos = {SCREEN_WIDTH/2 - quitgame_button.getWidth() / 2 , 710,quitgame_button.getWidth(),quitgame_button.getHeight()};
+	quitgame_button.render(pos.x, pos.y,&pos);
+	quitgame_button_iterator += 0.02;
+}
+
 void background_texture_render(){
 	if( state == start ){
 		start_texture.render(0,0);//Render texture to screen
@@ -488,14 +565,19 @@ void background_texture_render(){
 		//wasted animation
 	}
 	else if(state == get_f){
+		get_f_script();
 		get_f_texture.render(0,0);
+		quitgame_button_render();
 	}
 	else if(state == get_aplus){
-		
+		get_aplus_script();
+		get_aplus_texture.render(0,0);
+		quitgame_button_render();
 	}
 }
 
 void gatcha_animation(int num){
+	
 	SDL_Rect postmanR = {-100, 700, 100, 100};
 	SDL_Rect blockR = { 670, 410, 100, 100};
 	SDL_Rect paperR = { 670, 410, 100, 100};
@@ -565,17 +647,75 @@ void gatcha_animation(int num){
 			}
 			else return;
 			paper_texture[num].render(paperRf.x,paperRf.y,&paperRf);
-			
 		}
-		
 		SDL_Delay(10);
 		SDL_RenderPresent( gRenderer );
-		
+	}
+}
+
+void get_f_script(){
+	static bool played = false;
+	if(!played){
+		SDL_Rect r[5] ;
+		for(int i=0;i<5;i++){
+			r[i] = {50,630,get_f_subtitle[i].getWidth(),get_f_subtitle[i].getHeight()};
+		}
+		for(int i=0;i<5;i++){
+			SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+        	SDL_RenderClear( gRenderer );
+			get_f_subtitle[i].render(r[i].x,r[i].y,&r[i]);
+			SDL_RenderPresent( gRenderer );
+			SDL_Delay(5000); 
+		}
+		played = true;
 	}
 	
 }
 
+void get_aplus_script(){
+	static bool played = false;
+	if(!played){
+		SDL_Rect r[2] ;
+		r[0] = {50,630,get_aplus_subtitle[0].getWidth(),get_aplus_subtitle[0].getHeight()};
+		r[1] = {0,0,get_aplus_subtitle[1].getWidth(),get_aplus_subtitle[1].getHeight()};
+		
+		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+    	SDL_RenderClear( gRenderer );
+		get_aplus_subtitle[0].render(r[0].x,r[0].y,&r[0]);
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay(5000);
+		
+		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+    	SDL_RenderClear( gRenderer );
+		for(int i=0;i<=SCREEN_WIDTH/get_aplus_subtitle[1].getWidth();i++){
+			for(int j=0;j<=SCREEN_HEIGHT/get_aplus_subtitle[1].getHeight();j++){
+				r[1].x = i * get_aplus_subtitle[1].getWidth();
+				r[1].y = j * get_aplus_subtitle[1].getHeight();
+				get_aplus_subtitle[1].render(r[1].x,r[1].y,&r[1]);
+				
+			}
+		}
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay(5000); 
+		
+		played = true;
+	}
+}
 
+void prof_attack_animation(){
+	
+	double iter = PI/2;
+	SDL_Rect ballR = {700,160,40,40};//y=160~y=400
+	for(int i=0;i<60;i++){
+		background_texture_render();
+		ballR.x = 700 + 60*cos(iter);
+		ballR.y = 280 - 120*sin(iter);
+		magicball.render(ballR.x,ballR.y,&ballR);
+		student_healthbar.render();
+		SDL_RenderPresent( gRenderer );
+		iter -= (PI)/60;
+	}
+}
 
 
 

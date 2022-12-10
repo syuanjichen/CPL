@@ -76,7 +76,7 @@ void healthbar_class::update(student_class student){
 			render();
 			SDL_RenderPresent( gRenderer );//update screen
 			start--;
-			SDL_Delay(15);
+			SDL_Delay(50);
 		}
 	}
 	else if(end > start){
@@ -94,4 +94,5 @@ void healthbar_class::update(student_class student){
 		}
 	}
 	render();
+	previous_value = current_value;
 }

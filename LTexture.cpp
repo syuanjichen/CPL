@@ -139,7 +139,7 @@ bool LTexture::loadFromRenderedText_chinese( Uint16* text, SDL_Color textColor )
 	free();
 	
 	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderUNICODE_Solid( chinesefont, text, textColor );
+	SDL_Surface* textSurface = TTF_RenderUNICODE_Solid_Wrapped( chinesefont, text, textColor ,1280);
 	if( textSurface == NULL )
 	{
 		printf( "Unable to render chinese text surface! SDL_ttf Error: %s\n", TTF_GetError() );
