@@ -18,6 +18,7 @@ const int SCREEN_HEIGHT = 810;
 int block_x = SCREEN_WIDTH/16;
 int block_y = SCREEN_HEIGHT/9;
 bool getpaper[3] = {false};
+bool gatcha_played_animation[6] = {false};
 
 enum game_state {				//game states
 	start,						//just entered game
@@ -61,6 +62,8 @@ void continue_button_render();
 
 void background_texture_render();
 
+void gatcha_animation(int);	//input the number of drawn testpaper(0, 1, 2)
+
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
@@ -86,6 +89,10 @@ LTexture paper_status_table_texture ;
 LTexture paper_texture[3] ;
 LTexture continue_button ;
 LTexture chinese_test_texture;
+LTexture testpaper_postman_walk;
+LTexture testpaper_postman_jump;
+LTexture block_nothit;
+LTexture block_hit;
 
 student_class student;
 professor_class professor[6];
@@ -215,15 +222,23 @@ bool loadMedia()
 		printf( "Failed to load paper table texture!\n" );		success = false;	}
 	if( !paper_texture[0].loadFromFile( "img/testpaper_1.bmp" ) ){
 		printf( "Failed to load paper0 texture!\n" );		success = false;	}
-	if( !paper_texture[1].loadFromFile( "img/testpaper_1.bmp" ) ){
+	if( !paper_texture[1].loadFromFile( "img/testpaper_2.bmp" ) ){
 		printf( "Failed to load paper1 texture!\n" );		success = false;	}
-	if( !paper_texture[2].loadFromFile( "img/testpaper_1.bmp" ) ){
+	if( !paper_texture[2].loadFromFile( "img/testpaper_3.bmp" ) ){
 		printf( "Failed to load paper2 texture!\n" );		success = false;	}
 	if( !continue_button.loadFromRenderedText_goldenage( "--- Press Space To Continue ---" ,continue_button_color ) ){
 		printf( "Failed to load continue button texture!\n" );		success = false;	}
 	if( !chinese_test_texture.loadFromRenderedText_chinese( chinese_test ,continue_button_color ) ){
 		printf( "Failed to load good_morning_chinese texture!\n" );		success = false;	}
-    
+    if( !testpaper_postman_walk.loadFromFile( "img/testpaper_postman_walk.bmp"  ) ){
+		printf( "Failed to load testpaper_postman_walk texture!\n" );		success = false;	}
+	if( !testpaper_postman_jump.loadFromFile( "img/testpaper_postman_jump.bmp"  ) ){
+		printf( "Failed to load testpaper_postman_jump texture!\n" );		success = false;	}
+	if( !block_nothit.loadFromFile( "img/block_nothit.bmp"  ) ){
+		printf( "Failed to load block_nothit texture!\n" );		success = false;	}
+	if( !block_hit.loadFromFile( "img/block_hit.bmp"  ) ){
+		printf( "Failed to load block_hit texture!\n" );		success = false;	}
+
 	return success;
 }
 
@@ -242,6 +257,10 @@ void close()
 	}
 	paper_status_table_texture.free();
 	for(int i=0;i<3;i++)	paper_texture[i].free();
+	testpaper_postman_walk.free();
+	testpaper_postman_jump.free();
+	block_nothit.free();
+	block_hit.free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -255,7 +274,6 @@ void close()
 	SDL_DestroyWindow( gWindow );
 	gWindow = NULL;
 	gRenderer = NULL;
-	
 	
 	//Quit SDL subsystems
 	IMG_Quit();
@@ -355,8 +373,25 @@ int main( int argc, char* args[] )
 						
 					}
 					else if(state == gatcha){
-						//
-					}
+						if(e.type == SDL_KEYDOWN){
+							switch( e.key.keysym.sym ){
+                   	 	    case SDLK_SPACE:
+                   	     	    if(stage < 5){
+		                   	     	stage += 1;
+									state = enter_stage;
+								}
+								else{
+									if( getpaper[0] && getpaper[1] && getpaper[2] ){
+										state = get_aplus;
+									}
+									else{
+										state = get_f;
+									}
+								}
+                   	     	    break;
+                   	    	}
+						} 	    
+                   	}
 					else if(state == no_school){
 						//wasted animation
 					}
@@ -438,7 +473,16 @@ void background_texture_render(){
 		
 	}
 	else if(state == gatcha){
-		//
+		if(!gatcha_played_animation[stage]){
+			gatcha_animation(0);
+			gatcha_played_animation[stage] = true;
+		}
+		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+		SDL_RenderClear( gRenderer );
+		SDL_Rect paperRect = { 420, 105, 600, 600};
+		paper_texture[0].render(paperRect.x,paperRect.y,&paperRect);
+		continue_button_render();
+		SDL_RenderPresent( gRenderer );
 	}
 	else if(state == no_school){
 		//wasted animation
@@ -450,3 +494,88 @@ void background_texture_render(){
 		
 	}
 }
+
+void gatcha_animation(int num){
+	SDL_Rect postmanR = {-100, 700, 100, 100};
+	SDL_Rect blockR = { 670, 410, 100, 100};
+	SDL_Rect paperR = { 670, 410, 100, 100};
+	SDL_Rect paperRf = { 720, 405, 0, 0};
+	bool jumped = false;
+	bool finished = false;
+	while(postmanR.x < 1440){
+		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+        SDL_RenderClear( gRenderer );
+        if(jumped){
+			if(paperR.y > 310){
+				paper_texture[num].render(paperR.x,paperR.y,&paperR);
+				paperR.y -= 5;
+			}
+			else{
+				paper_texture[num].render(paperR.x,paperR.y,&paperR);
+			}
+			
+		}
+		
+		if(!jumped){
+        	block_nothit.render(blockR.x,blockR.y,&blockR);
+		}
+        else{
+        	block_hit.render(blockR.x,blockR.y,&blockR);
+		}
+		
+		if(postmanR.x < 670){
+			testpaper_postman_walk.render(postmanR.x,postmanR.y,&postmanR);
+			postmanR.x += 5;
+		}
+		else if(postmanR.x == 670){
+			if(!jumped){
+				testpaper_postman_jump.render(postmanR.x,postmanR.y ,&postmanR);
+				if(postmanR.y > 510){
+					postmanR.y -= 10;
+				}
+				else{
+					jumped = true;
+				}
+			}
+			else{
+				testpaper_postman_jump.render(postmanR.x,postmanR.y ,&postmanR);
+				if(postmanR.y < 710){
+					postmanR.y += 10;
+				}
+				else {
+					postmanR.x += 5;
+				}
+			}
+		}
+		else if(postmanR.x > 670 && postmanR.x <= 1430){
+			testpaper_postman_walk.render(postmanR.x,postmanR.y,&postmanR);
+			postmanR.x += 5;
+		}
+		else if(postmanR.x > 1430){
+			finished = true;
+		}
+		
+		if(finished){
+			
+			if(paperRf.w < 600){
+				paperRf.x -= 3;
+				paperRf.y -= 3;
+				paperRf.w += 6;
+				paperRf.h += 6;
+			}
+			else return;
+			paper_texture[num].render(paperRf.x,paperRf.y,&paperRf);
+			
+		}
+		
+		SDL_Delay(10);
+		SDL_RenderPresent( gRenderer );
+		
+	}
+	
+}
+
+
+
+
+
