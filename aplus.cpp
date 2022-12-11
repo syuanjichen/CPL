@@ -19,6 +19,9 @@ int block_x = SCREEN_WIDTH/16;
 int block_y = SCREEN_HEIGHT/9;
 bool getpaper[3] = {false};
 bool gatcha_played_animation[6] = {false};
+bool noschool_played = false;
+bool get_aplus_played = false;
+bool get_f_played = false;
 
 enum game_state {				//game states
 	start,						//just entered game
@@ -72,6 +75,10 @@ void get_aplus_script();
 
 void prof_attack_animation();
 
+void noschool_script();
+
+void game_init();
+
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
@@ -85,6 +92,7 @@ SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
 SDL_Color get_f_text_color = {0xFF,0xFF,0xFF};
 SDL_Color quitgame_button_color = {0x00,0x00,0x00};
+SDL_Color godsound_color = {255,239,69};
 
 LTexture start_texture ;  				//texture of start scene
 LTexture explanation_texture ;			//texture of explanation scene
@@ -107,7 +115,9 @@ LTexture block_nothit;
 LTexture block_hit;
 LTexture get_aplus_texture;
 LTexture get_aplus_subtitle[2];
-LTexture magicball; 
+LTexture magicball;
+LTexture noschool_subtitle[3];
+LTexture wasted; 
 
 student_class student;
 professor_class professor[6];
@@ -121,8 +131,11 @@ Uint16 get_f_text_1[] = {0x6211,0x76e1,0x529b,0x4e86,0xff0c,0x6211,0x76e1,0x5168
 Uint16 get_f_text_2[] = {0x5982,0x679c,0x628a,0x6642,0x9593,0x62ff,0x53bb,0x8907,0x7fd2,0x7684,0x8a71,0xff0c,0x8aaa,0x4e0d,0x5b9a,0x9084,0x6709,0x6a5f,0x6703,0x901a,0x904e,0x8003,0x8a66,0x3002};
 Uint16 get_f_text_3[] = {0x65e9,0x77e5,0x9053,0x5c31,0x4e0d,0x8a72,0x6d6a,0x8cbb,0x6642,0x9593,0x5728,0x9019,0x5b87,0x5b99,0x7cde,0x904a,0x4e0a,0x4e86,0x3002};
 Uint16 get_f_text_4[] = {0x4f86,0x751f,0x9084,0x60f3,0x62ff,0x66f8,0x5377,0x734e,0x554a,0x3002};
-Uint16 get_aplus_text_0[] = {0x7d93,0x6b77,0x4e86,0x5343,0x8f9b,0x842c,0x82e6,0xff0c,0x6211,0x7d42,0x65bc,0x7372,0x5f97,0x4e86,0x81f3,0x9ad8,0x5c0a,0x5bf6,0x300e,0x66f8,0x5377,0x734e,0x300f,0x3002};
+Uint16 get_aplus_text_0[] = {0x7d93,0x6b77,0x4e86,0x5343,0x8f9b,0x842c,0x82e6,0xff0c,0x6211,0x7d42,0x65bc,0x7372,0x5f97,0x4e86,0x81f3,0x9ad8,0x5c0a,0x5bf6,0x300e,0x66f8,0x5377,0x734e,0x300f,0x3002,0x6211,0x8214,0x3002,0x0000,0x0000};
 Uint16 get_aplus_text_1[] = {0x6211,0x8214};
+Uint16 noschool_text_0[] = {0x53ef,0x60e1,0xff0c,0x4f86,0x751f,0x9084,0x60f3,0x8b80,0x53f0,0x5927,0x554a,0xff01};
+Uint16 noschool_text_1[] = {0x8b0e,0x4e4b,0x8072,0xff1a,0x52c7,0x8005,0xff0c,0x6b64,0x5730,0x975e,0x6c5d,0x4e4b,0x7d42,0x7109,0xff0c,0x7576,0x596e,0x8d77,0x518d,0x6230,0x3002};
+Uint16 noschool_text_2[] = {0x554a,0xff1f,0x54a6,0xff1f,0x86e4,0xff1f,0x55ef,0xff1f,0x0000,0x0000};
 
 bool init()
 {
@@ -280,6 +293,15 @@ bool loadMedia()
 		printf( "Failed to load get_aplus_text_1 texture!\n" );	success = false;	}
 	if( !magicball.loadFromFile( "img/magicball.bmp"  ) ){
 		printf( "Failed to load magicball texture!\n" );		success = false;	}	
+	if( !noschool_subtitle[0].loadFromRenderedText_chinese( noschool_text_0 ,get_f_text_color ) ){
+		printf( "Failed to load noschool text0 texture!\n" );	success = false;	}
+	if( !noschool_subtitle[1].loadFromRenderedText_chinese( noschool_text_1 ,godsound_color ) ){
+		printf( "Failed to load noschool text1 texture!\n" );	success = false;	}
+	if( !noschool_subtitle[2].loadFromRenderedText_chinese( noschool_text_2 ,get_f_text_color ) ){
+		printf( "Failed to load noschool text2 texture!\n" );	success = false;	}
+	if( !wasted.loadFromFile( "img/wasted.bmp"  ) ){
+		printf( "Failed to load wasted texture!\n" );		success = false;	}	
+	
 	return success;
 }
 
@@ -308,6 +330,8 @@ void close()
 	for(int i=0;i<2;i++)	get_aplus_subtitle[i].free();
 	get_aplus_texture.free();
 	magicball.free();
+	for(int i=0;i<3;i++)	noschool_subtitle[i].free();
+	wasted.free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -562,6 +586,7 @@ void background_texture_render(){
 		SDL_RenderPresent( gRenderer );
 	}
 	else if(state == no_school){
+		noschool_script();
 		//wasted animation
 	}
 	else if(state == get_f){
@@ -654,8 +679,8 @@ void gatcha_animation(int num){
 }
 
 void get_f_script(){
-	static bool played = false;
-	if(!played){
+	
+	if(!get_f_played){
 		SDL_Rect r[5] ;
 		for(int i=0;i<5;i++){
 			r[i] = {50,630,get_f_subtitle[i].getWidth(),get_f_subtitle[i].getHeight()};
@@ -667,14 +692,14 @@ void get_f_script(){
 			SDL_RenderPresent( gRenderer );
 			SDL_Delay(5000); 
 		}
-		played = true;
+		get_f_played = true;
 	}
 	
 }
 
 void get_aplus_script(){
-	static bool played = false;
-	if(!played){
+	
+	if(!get_aplus_played){
 		SDL_Rect r[2] ;
 		r[0] = {50,630,get_aplus_subtitle[0].getWidth(),get_aplus_subtitle[0].getHeight()};
 		r[1] = {0,0,get_aplus_subtitle[1].getWidth(),get_aplus_subtitle[1].getHeight()};
@@ -698,7 +723,7 @@ void get_aplus_script(){
 		SDL_RenderPresent( gRenderer );
 		SDL_Delay(5000); 
 		
-		played = true;
+		get_aplus_played = true;
 	}
 }
 
@@ -717,5 +742,37 @@ void prof_attack_animation(){
 	}
 }
 
+void noschool_script(){
+	if(!noschool_played){
+		SDL_Rect r[3] ;
+		SDL_Rect wr = {0,100,wasted.getWidth(),wasted.getHeight()};
+		for(int i=0;i<3;i++){
+			r[i] = {50,630,noschool_subtitle[i].getWidth(),noschool_subtitle[i].getHeight()};
+		}
+		for(int i=0;i<3;i++){
+			SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+	    	SDL_RenderClear( gRenderer );
+	    	if(i <= 1){ wasted.render(wr.x,wr.y,&wr);}
+			noschool_subtitle[i].render(r[i].x, r[i].y, &r[i]);
+			SDL_RenderPresent( gRenderer );
+			SDL_Delay(5000);
+		}
+		noschool_played = true;
+		game_init();
+		
+	}
+}
 
+void game_init(){
+	state = start;
+	stage = 1;
+	student.init();
+	for(int i=0;i<5;i++)	{ professor[i] = professor_class(i); }
+	professor[5] = professor_class(0);
+	for(int i=0;i<3;i++) 	getpaper[i] = false;
+	for(int i=0;i<6;i++)	gatcha_played_animation[i] = false;
+	get_aplus_played = false;
+	get_f_played = false;
+	noschool_played = false;
+}
 
