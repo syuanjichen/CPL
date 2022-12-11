@@ -36,6 +36,10 @@ enum game_state {				//game states
 };
 game_state state = start;	  //define state as the variable indicates current game state
 int stage = 1;				  //stage indicate which stage now is in
+bool paper[3] = {};
+int paper_num = 0;
+int yes;
+int no;
 	
 bool init();				  //Starts up SDL and creates window
 
@@ -460,6 +464,60 @@ int main( int argc, char* args[] )
 							switch( e.key.keysym.sym ){
                    	 	    case SDLK_SPACE:
                    	     	    if(stage < 5){
+                                    srand(time(NULL));
+                                    int a = rand();
+                                    if(paper_num == 0)
+                                    {
+                                        paper[a%3] = true;
+                                        paper_num++;
+                                        yes = a%3;
+                                    }
+                                    else if(paper_num == 1)
+                                    {
+                                        if(a%6)
+                                        {
+                                            if((a%6)%2)
+                                            {
+                                                paper[(yes+1)%3] = true;
+                                                paper_num++;
+                                                no = (yes+2)%3;
+                                            }
+                                            else
+                                            {
+                                                paper[(yes+2)%3] = true;
+                                                paper_num++;
+                                                no = (yes+1)%3;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            paper[yes] = true; // 重複獲得
+                                        }
+                                    }
+                                    else if(paper_num == 2)
+                                    {
+                                        if(a%3)
+                                        {
+                                            paper[no] = true;
+                                            paper_num++;
+                                        }
+                                        else
+                                        {
+                                            if(a%2)
+                                            {
+                                                paper[(no+1)%3] = true; // 重複獲得
+                                            }
+                                            else
+                                            {
+                                                paper[(no+2)%3] = true; // 重複獲得
+                                            }
+                                        }
+                                    }
+                                    else if(paper_num == 3)
+                                    {
+                                        paper[a%3] = true; // 重複獲得
+                                        // 獲得第a%3的畫面
+                                    }
 		                   	     	stage += 1;
 									state = enter_stage;
 								}
