@@ -17,11 +17,12 @@ const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
 int block_x = SCREEN_WIDTH/16;
 int block_y = SCREEN_HEIGHT/9;
-bool getpaper[3] = {false};
 bool gatcha_played_animation[6] = {false};
 bool noschool_played = false;
 bool get_aplus_played = false;
 bool get_f_played = false;
+bool drawn_paper[6] = {false};
+int the_paper;//the paper drawn in every stage
 
 enum game_state {				//game states
 	start,						//just entered game
@@ -82,6 +83,8 @@ void prof_attack_animation();
 void noschool_script();
 
 void game_init();
+
+int draw_paper();
 
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
@@ -460,69 +463,17 @@ int main( int argc, char* args[] )
 						
 					}
 					else if(state == gatcha){
+						
 						if(e.type == SDL_KEYDOWN){
 							switch( e.key.keysym.sym ){
                    	 	    case SDLK_SPACE:
                    	     	    if(stage < 5){
-                                    srand(time(NULL));
-                                    int a = rand();
-                                    if(paper_num == 0)
-                                    {
-                                        paper[a%3] = true;
-                                        paper_num++;
-                                        yes = a%3;
-                                    }
-                                    else if(paper_num == 1)
-                                    {
-                                        if(a%6)
-                                        {
-                                            if((a%6)%2)
-                                            {
-                                                paper[(yes+1)%3] = true;
-                                                paper_num++;
-                                                no = (yes+2)%3;
-                                            }
-                                            else
-                                            {
-                                                paper[(yes+2)%3] = true;
-                                                paper_num++;
-                                                no = (yes+1)%3;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            paper[yes] = true; // 重複獲得
-                                        }
-                                    }
-                                    else if(paper_num == 2)
-                                    {
-                                        if(a%3)
-                                        {
-                                            paper[no] = true;
-                                            paper_num++;
-                                        }
-                                        else
-                                        {
-                                            if(a%2)
-                                            {
-                                                paper[(no+1)%3] = true; // 重複獲得
-                                            }
-                                            else
-                                            {
-                                                paper[(no+2)%3] = true; // 重複獲得
-                                            }
-                                        }
-                                    }
-                                    else if(paper_num == 3)
-                                    {
-                                        paper[a%3] = true; // 重複獲得
-                                        // 獲得第a%3的畫面
-                                    }
+                                    
 		                   	     	stage += 1;
 									state = enter_stage;
 								}
 								else{
-									if( getpaper[0] && getpaper[1] && getpaper[2] ){
+									if( paper[0] && paper[1] && paper[2] ){
 										state = get_aplus;
 									}
 									else{
@@ -574,9 +525,9 @@ int probability(double hit_rate, double avoid_rate){		//function of hitting of n
 
 void papertable_render(){
 	paper_status_table_texture.render(0,0,&paper_table_rect);
-	if(getpaper[0])	paper_texture[0].render(35,15,&paper_1_rect);
-	if(getpaper[1])	paper_texture[1].render(105,15,&paper_2_rect);
-	if(getpaper[2])	paper_texture[2].render(175,15,&paper_3_rect);
+	if(paper[0])	paper_texture[0].render(35,15,&paper_1_rect);
+	if(paper[1])	paper_texture[1].render(105,15,&paper_2_rect);
+	if(paper[2])	paper_texture[2].render(175,15,&paper_3_rect);
 }
 
 void battlescene_render(){
@@ -632,14 +583,16 @@ void background_texture_render(){
 		
 	}
 	else if(state == gatcha){
+		
 		if(!gatcha_played_animation[stage]){
-			gatcha_animation(0);
+			the_paper = draw_paper();
+			gatcha_animation(the_paper);
 			gatcha_played_animation[stage] = true;
 		}
 		SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
 		SDL_RenderClear( gRenderer );
 		SDL_Rect paperRect = { 420, 105, 600, 600};
-		paper_texture[0].render(paperRect.x,paperRect.y,&paperRect);
+		paper_texture[the_paper].render(paperRect.x,paperRect.y,&paperRect);
 		continue_button_render();
 		SDL_RenderPresent( gRenderer );
 	}
@@ -827,10 +780,79 @@ void game_init(){
 	student.init();
 	for(int i=0;i<5;i++)	{ professor[i] = professor_class(i); }
 	professor[5] = professor_class(0);
-	for(int i=0;i<3;i++) 	getpaper[i] = false;
-	for(int i=0;i<6;i++)	gatcha_played_animation[i] = false;
+	for(int i=0;i<3;i++) 	paper[i] = false;
+	for(int i=0;i<6;i++)	{gatcha_played_animation[i] = false; drawn_paper[i] = false;}
 	get_aplus_played = false;
 	get_f_played = false;
 	noschool_played = false;
+	paper_num = 0;
+}
+
+int draw_paper(){
+	srand(time(NULL));
+	int the_drawn_paper = 0;
+    int a = rand();
+    if(paper_num == 0)
+    {
+        paper[a%3] = true;
+        paper_num++;
+        yes = a%3;
+        the_drawn_paper = a%3;
+    }
+    else if(paper_num == 1)
+    {
+        if(a%6)
+        {
+            if((a%6)%2)
+            {
+                paper[(yes+1)%3] = true;
+                paper_num++;
+                no = (yes+2)%3;
+                the_drawn_paper = (yes+1)%3;
+            }
+            else
+            {
+                paper[(yes+2)%3] = true;
+                paper_num++;
+                no = (yes+1)%3;
+                the_drawn_paper = (yes+2)%3;
+            }
+        }
+        else
+        {
+            paper[yes] = true; // got same paper
+            the_drawn_paper = yes;
+        }
+    }
+    else if(paper_num == 2)
+    {
+        if(a%3)
+        {
+            paper[no] = true;
+            paper_num++;
+            the_drawn_paper = no;
+        }
+        else
+        {
+            if(a%2)
+            {
+                paper[(no+1)%3] = true; // got same paper
+                the_drawn_paper = (no+1)%3;
+            }
+            else
+            {
+                paper[(no+2)%3] = true; // got same paper
+                the_drawn_paper = (no+1)%3;
+            }
+        }
+    }
+    else if(paper_num == 3)
+    {
+        paper[a%3] = true; // got same paper
+        the_drawn_paper = a%3;
+        // scene of getting the a%3 th paper
+    }
+    drawn_paper[stage] = true;
+    return the_drawn_paper;
 }
 
