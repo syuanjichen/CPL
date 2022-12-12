@@ -60,6 +60,9 @@ TTF_Font *gFont = NULL;
 
 TTF_Font *chinesefont = NULL;
 
+cards all_card[21], **battle_deck;
+
+
 int probability(double hit_rate, double avoid_rate);
 
 void papertable_render();
@@ -95,6 +98,8 @@ SDL_Rect paper_table_rect		= {	0				, 0						, 270		 , 90		 };
 SDL_Rect paper_1_rect			= {	35				, 15					, 60		 , 60		 };
 SDL_Rect paper_2_rect			= {	105				, 15					, 60		 , 60		 };
 SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
+SDL_Rect deck_rect[6] = {{280, 450, 280, 140}, {580, 450, 280, 140}, {880, 450, 280, 140}, {280, 600, 280, 140}, {580, 600, 280, 140}, {880, 600, 280, 140}};
+
 
 SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
 SDL_Color get_f_text_color = {0xFF,0xFF,0xFF};
@@ -110,6 +115,7 @@ LTexture get_f_texture ;				//texture of getting f end
 LTexture professor_texture[6] ;			//texture of professor
 LTexture stage_background_texture[6];	//texture of battle backgrounds
 LTexture healthbar_texture ;			//texture of healthbar
+LTexture card_texture[21];              //texture of the cards
 LTexture paper_status_table_texture ;
 LTexture paper_texture[3] ;
 LTexture continue_button ;
@@ -260,6 +266,48 @@ bool loadMedia()
 		printf( "Failed to load stage 4 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[5].loadFromFile( "img/stage_background_5.bmp" ) ){
 		printf( "Failed to load stage 5 bg texture!\n" );		success = false;	}
+	if( !card_texture[0].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_00 texture!\n");	success = false;}
+	if( !card_texture[1].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_01 texture!\n");	success = false;}
+	if( !card_texture[2].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_02 texture!\n");	success = false;}
+	if( !card_texture[3].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_03 texture!\n");	success = false;}
+	if( !card_texture[4].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_04 texture!\n");	success = false;}
+	if( !card_texture[5].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_05 texture!\n");	success = false;}
+	if( !card_texture[6].loadFromFile("img/card_06.bmp")){
+		printf("Failed to load card_06 texture!\n");	success = false;}
+	if( !card_texture[7].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_07 texture!\n");	success = false;}
+	if( !card_texture[8].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_08 texture!\n");	success = false;}
+	if( !card_texture[9].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_09 texture!\n");	success = false;}
+	if( !card_texture[10].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_10 texture!\n");	success = false;}
+	if( !card_texture[11].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_11 texture!\n");	success = false;}
+	if( !card_texture[12].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_12 texture!\n");	success = false;}
+	if( !card_texture[13].loadFromFile("img/card_12.bmp")){
+		printf("Failed to load card_13 texture!\n");	success = false;}
+	if( !card_texture[14].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_14 texture!\n");	success = false;}
+	if( !card_texture[15].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_15 texture!\n");	success = false;}
+	if( !card_texture[16].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_16 texture!\n");	success = false;}
+	if( !card_texture[17].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_17 texture!\n");	success = false;}
+	if( !card_texture[18].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_18 texture!\n");	success = false;}
+	if( !card_texture[19].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_19 texture!\n");	success = false;}
+	if( !card_texture[20].loadFromFile("img/card_17.bmp")){
+		printf("Failed to load card_20 texture!\n");	success = false;}
 	if( !healthbar_texture.loadFromFile( "img/healthbar.bmp" ) ){
 		printf( "Failed to load healthbar texture!\n" );		success = false;	}
 	if( !paper_status_table_texture.loadFromFile( "img/testpaper_background.bmp" ) ){
@@ -333,6 +381,7 @@ void close()
 	testpaper_postman_jump.free();
 	block_nothit.free();
 	block_hit.free();
+	for(int i = 0 ; i < 21 ; i++)	card_texture[i].free();
 	for(int i=0;i<5;i++)	get_f_subtitle[i].free();
 	for(int i=0;i<2;i++)	get_aplus_subtitle[i].free();
 	get_aplus_texture.free();
@@ -362,6 +411,9 @@ void close()
 
 int main( int argc, char* args[] )
 {
+	cards_initialize(all_card);
+	battle_deck = deck_initialize(all_card);
+
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -530,6 +582,18 @@ void papertable_render(){
 	if(paper[2])	paper_texture[2].render(175,15,&paper_3_rect);
 }
 
+void card_graph_render()
+{
+	int i, j;
+	for(i = 0 ; i < 2 ; i++)
+	{
+		for(j = 0 ; j < 3 ; j++)
+		{
+			card_texture[battle_deck[i][j].id].render(deck_rect[3 * i + j].x, deck_rect[3 * i + j].y, &deck_rect[3 * i + j]);
+		}
+	}
+}
+
 void battlescene_render(){
 	stage_background_texture[stage].render(0,0);//Render texture to screen
 	if (student.burning){ burning_texture.render( student_burn_rect.x , student_burn_rect.y, &student_burn_rect ); }
@@ -538,6 +602,9 @@ void battlescene_render(){
 	if (professor[stage].stunning){ stunning_texture.render( professor_stun_rect.x , professor_stun_rect.y, &professor_stun_rect ); }
 	
 	professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
+
+	card_graph_render();
+
 	
 	papertable_render();
 	professor_healthbar[stage].render();	//render healthbar
