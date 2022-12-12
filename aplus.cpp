@@ -101,6 +101,7 @@ SDL_Rect paper_1_rect			= {	35				, 15					, 60		 , 60		 };
 SDL_Rect paper_2_rect			= {	105				, 15					, 60		 , 60		 };
 SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 SDL_Rect deck_rect[6] = {{280, 450, 280, 140}, {580, 450, 280, 140}, {880, 450, 280, 140}, {280, 600, 280, 140}, {580, 600, 280, 140}, {880, 600, 280, 140}};
+SDL_Rect shieldRect = {block_x * 5-50, 45 + block_y * 4-15,60,60};
 
 
 SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
@@ -133,6 +134,7 @@ LTexture get_aplus_subtitle[2];
 LTexture magicball;
 LTexture noschool_subtitle[3];
 LTexture wasted; 
+LTexture shield_texture; 
 
 student_class student;
 professor_class professor[6];
@@ -357,7 +359,10 @@ bool loadMedia()
 	if( !noschool_subtitle[2].loadFromRenderedText_chinese( noschool_text_2 ,get_f_text_color ) ){
 		printf( "Failed to load noschool text2 texture!\n" );	success = false;	}
 	if( !wasted.loadFromFile( "img/wasted.bmp"  ) ){
-		printf( "Failed to load wasted texture!\n" );		success = false;	}	
+		printf( "Failed to load wasted texture!\n" );		success = false;	}
+	if( !shield_texture.loadFromFile( "img/shield.bmp"  ) ){
+		printf( "Failed to load shield texture!\n" );		success = false;	}		
+	shield_texture.setBlendMode(SDL_BLENDMODE_BLEND);		shield_texture.setAlpha(230);
 	
 	return success;
 }
@@ -390,6 +395,7 @@ void close()
 	magicball.free();
 	for(int i=0;i<3;i++)	noschool_subtitle[i].free();
 	wasted.free();
+	shield_texture.free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -611,6 +617,7 @@ void battlescene_render(){
 	papertable_render();
 	professor_healthbar[stage].render();	//render healthbar
 	student_healthbar.render();				//render healthbar
+	if (student.shield){ shield_texture.render( shieldRect.x , shieldRect.y , &shieldRect ); }
 }
 
 void continue_button_render(){
@@ -813,12 +820,14 @@ void prof_attack_animation(){
 	SDL_Rect ballR = {700,160,40,40};//y=160~y=400
 	for(int i=0;i<60;i++){
 		background_texture_render();
-		ballR.x = 700 + 60*cos(iter);
+		ballR.x = 700 + 60*cos(iter) - i * 5;
 		ballR.y = 280 - 120*sin(iter);
-		magicball.render(ballR.x,ballR.y,&ballR);
 		student_healthbar.render();
+		if (student.shield){ shield_texture.render( shieldRect.x , shieldRect.y , &shieldRect ); }
+		magicball.render(ballR.x,ballR.y,&ballR);
 		SDL_RenderPresent( gRenderer );
 		iter -= (PI)/60;
+		SDL_Delay(10);
 	}
 }
 
