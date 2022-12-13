@@ -33,5 +33,6 @@ class healthbar_class{
 		void update(student_class);
 		void update(professor_class);
 		void render();
+		void render(student_class);
 };
 #endif

@@ -1,4 +1,8 @@
 #include "healthbar.h"
+#include "LTexture.h"
+
+extern LTexture shield_texture;
+extern void battlescene_render();
 
 healthbar_class::healthbar_class(int x0, int y0, student_class student){
 	x = x0;
@@ -60,6 +64,23 @@ void healthbar_class::render(){
 		}
 	}
 }
+void healthbar_class::render(student_class student){
+	SDL_Rect bgRect = { x-38 , y-5 , 663 , 40 };
+	healthbar_texture.render( bgRect.x , bgRect.y , &bgRect );
+	for(int i=0;i<100;++i){
+		SDL_Rect rect = {x + 6 * i, y, 6, 30};
+		if( hp[i] == true ){
+			SDL_SetRenderDrawColor( gRenderer,76,205,47,0xFF );
+			SDL_RenderFillRect( gRenderer, &rect );
+		}
+		else{
+			SDL_SetRenderDrawColor( gRenderer,0,0,0,0xFF );
+			SDL_RenderFillRect( gRenderer, &rect );
+		}
+	}
+	SDL_Rect SR = {x-50,y-15,60,60};
+	if(student.shield){ shield_texture.render( SR.x , SR.y , &SR ); }
+}
 void healthbar_class::update(student_class student){
 	current_value = student.health;
 	int end = ( current_value * 100 ) / max_value;
@@ -72,8 +93,9 @@ void healthbar_class::update(student_class student){
 			}
 			for(int i=start;i<100;i++){
 				hp[i] = false;
-			} 
-			render();
+			}
+			battlescene_render(); 
+			render(student);
 			SDL_RenderPresent( gRenderer );//update screen
 			start--;
 			SDL_Delay(50);
@@ -86,8 +108,9 @@ void healthbar_class::update(student_class student){
 			}
 			for(int i=start;i<100;i++){
 				hp[i] = false;
-			} 
-			render();
+			}
+			battlescene_render(); 
+			render(student);
 			SDL_RenderPresent( gRenderer );//update screen
 			start++;
 			SDL_Delay(20);

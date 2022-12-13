@@ -445,7 +445,7 @@ int main( int argc, char* args[] )
 			for(int i=0;i<5;i++)	{ professor[i] = professor_class(i); }
 			professor[5] = professor_class(0);
 			
-			for(int i=0;i<5;i++)	{ professor_healthbar[i] = healthbar_class( block_x * 8 - 332+38 , 5 , professor[i] ); }
+			for(int i=0;i<6;i++)	{ professor_healthbar[i] = healthbar_class( block_x * 8 - 332+38 , 5 , professor[i] ); }
 			
 			
 			//While application is running
@@ -616,8 +616,8 @@ void battlescene_render(){
 	
 	papertable_render();
 	professor_healthbar[stage].render();	//render healthbar
-	student_healthbar.render();				//render healthbar
-	if (student.shield){ shield_texture.render( shieldRect.x , shieldRect.y , &shieldRect ); }
+	student_healthbar.render(student);				//render healthbar
+	//if (student.shield){ shield_texture.render( shieldRect.x , shieldRect.y , &shieldRect ); }
 }
 
 void continue_button_render(){
@@ -822,8 +822,7 @@ void prof_attack_animation(){
 		background_texture_render();
 		ballR.x = 700 + 60*cos(iter) - i * 5;
 		ballR.y = 280 - 120*sin(iter);
-		student_healthbar.render();
-		if (student.shield){ shield_texture.render( shieldRect.x , shieldRect.y , &shieldRect ); }
+		student_healthbar.render(student);
 		magicball.render(ballR.x,ballR.y,&ballR);
 		SDL_RenderPresent( gRenderer );
 		iter -= (PI)/60;
