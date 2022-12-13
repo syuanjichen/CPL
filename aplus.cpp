@@ -95,6 +95,12 @@ void card_graph_render();
 
 void professor_name_render();
 
+void stud_attack_animation();
+
+cards** deck_initialize(cards all[]);
+
+void card_draw(cards *deck[], cards all[]);
+
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
@@ -141,6 +147,9 @@ LTexture noschool_subtitle[3];
 LTexture wasted; 
 LTexture shield_texture; 
 LTexture professor_name[6];
+LTexture magicball_center;
+LTexture magicball_ring_1;
+LTexture magicball_ring_2; 
 
 student_class student;
 professor_class professor[6];
@@ -391,7 +400,13 @@ bool loadMedia()
 		printf( "Failed to load professor_name4 texture!\n" );	success = false;	}
 	if( !professor_name[5].loadFromRenderedText_name( professor_name_text_5 , prof_name_color ) ){
 		printf( "Failed to load professor_name5 texture!\n" );	success = false;	}
-	
+	if( !magicball_center.loadFromFile( "img/magic_sphere.bmp"  ) ){
+		printf( "Failed to load magicball_center texture!\n" );		success = false;	}
+	if( !magicball_ring_1.loadFromFile( "img/magic_ring_1.bmp"  ) ){
+		printf( "Failed to load magic_ring_1 texture!\n" );		success = false;	}
+	if( !magicball_ring_2.loadFromFile( "img/magic_ring_2.bmp"  ) ){
+		printf( "Failed to load magic_ring_2 texture!\n" );		success = false;	}	
+
 	return success;
 }
 
@@ -424,6 +439,10 @@ void close()
 	for(int i=0;i<3;i++)	noschool_subtitle[i].free();
 	wasted.free();
 	shield_texture.free();
+	for(int i=0;i<6;i++)	professor_name[i].free();
+	magicball_center.free();
+	magicball_ring_1.free();
+	magicball_ring_2.free(); 
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -445,7 +464,47 @@ void close()
 	SDL_Quit();
 }
 
+cards** deck_initialize(cards all[])
+{
+    int i, j, random_id;
+    cards **deck;
+    deck = new cards* [2];
 
+    for(i = 0 ; i < 2 ; i++)
+    {
+        deck[i] = new cards [3];
+    }
+
+    srand(time(0));
+
+    for(i = 0 ; i < 2 ; i++)
+    {
+        for(j = 0 ; j < 3 ; j++)
+        {
+            random_id = rand() % 21;
+            deck[i][j] = all[random_id];
+        }
+    }
+
+    return deck;
+}
+
+void card_draw(cards *deck[], cards all[])
+{
+    int i, j;
+    srand(time(0));
+    
+    for(i = 0 ; i < 2 ; i++)
+    {
+        for(j = 0 ; j < 3 ; j++)
+        {
+            if(deck[i][j].id == -1)
+            {
+                deck[i][j] = (all[rand() % 21]);
+            }
+        }
+    }
+}
 
 int main( int argc, char* args[] )
 {
@@ -520,17 +579,41 @@ int main( int argc, char* args[] )
 						}
 						else if( state == student_attacking ){
 							//if mouse is on card: show detail
+							professor[stage].attack = 50;
+							if(!student.stunning && probability(student.hit_rate,professor[stage].avoid_rate) == 1){
+								stud_attack_animation();
+								SDL_Delay(300);
+								cout<<battle_deck[0][0].get_attack()<<endl;
+								professor[stage].hurt(battle_deck[0][0]);	//professor get hurt 
+								professor_healthbar[stage].update(professor[stage]);
+								SDL_Delay(300);
+								if( professor[stage].burning == true){ professor[stage].health -= 3; }{
+									professor_healthbar[stage].update(professor[stage]);
+									SDL_Delay(300);
+								}
+								
+								//deal with card effect
+								
+								if(professor[stage].alive() == false){
+									
+									state = gatcha;
+								}
+								else{
+									state = professor_attacking;
+								}
+								
+							}
 							
-							//professor get hurt 
-							//professor died or not
 							
-							//deal with card effect
+							
+							
+							
 							
 							
 						}
 						else if( state == professor_attacking ){
 							
-							if(!professor[stage].stunning){
+							if(!professor[stage].stunning ){
 								prof_attack_animation();
 								student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
 								professor[stage].do_effect(student);
@@ -542,7 +625,8 @@ int main( int argc, char* args[] )
 								student_healthbar.update(student);
 								SDL_Delay(300);
 							}
-							if( student.alive() == false ){	
+							if( student.alive() == false ){
+								
 								state = no_school; 
 							}
 							else{
@@ -969,4 +1053,36 @@ void professor_name_render(){
 //	SDL_RenderFillRect( gRenderer , &Rect );
 	professor_name[stage].render( Rect.x, Rect.y, &Rect);
 }
+
+void stud_attack_animation(){
+	double deg = 0;
+	SDL_Point center = {block_x * 5+19, 45 + block_y * 4+20};
+	SDL_Rect ballR = { center.x - 30 , center.y - 30 , 60 , 60 };
+	SDL_Rect ringR = { center.x - 60 , center.y - 60 , 120, 120};
+	for(int i=0;i<240;i++){
+		background_texture_render();
+		center.x +=  1;
+		center.y -=  1;
+		ballR = { center.x - 30 , center.y - 30 , 60 , 60 };
+		ringR = { center.x - 60 , center.y - 60 , 120, 120};
+		professor_healthbar[stage].render();
+		magicball_center.render(ballR.x,ballR.y,&ballR);
+		magicball_ring_1.render(ringR.x,ringR.y,&ringR  ,  5*i);
+		magicball_ring_2.render(ringR.x,ringR.y,&ringR  , -5*i);
+		deg = 5*i;
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay(5);
+	}
+	for(int i=0;i<20;i++){
+		professor_healthbar[stage].render();
+		magicball_center.render(ballR.x,ballR.y,&ballR);
+		magicball_ring_1.render(ringR.x,ringR.y,&ringR  ,  deg);
+		magicball_ring_2.render(ringR.x,ringR.y,&ringR  , -deg);
+		SDL_RenderPresent( gRenderer );
+		SDL_Delay(20);
+		
+	}
+}
+
+
 

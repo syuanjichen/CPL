@@ -90,7 +90,7 @@ void healthbar_class::update(student_class student){
 	int start = ( previous_value * 100 ) / max_value;
 	if(end < start){
 		
-		while(start != end){
+		while(start >= end){
 			for(int i=0;i<start;i++){
 				hp[i] = true;
 			}
@@ -105,7 +105,7 @@ void healthbar_class::update(student_class student){
 		}
 	}
 	else if(end > start){
-		while(start != end){
+		while(start < end){
 			for(int i=0;i<start;i++){
 				hp[i] = true;
 			}
@@ -114,6 +114,45 @@ void healthbar_class::update(student_class student){
 			}
 			battlescene_render(); 
 			render(student);
+			SDL_RenderPresent( gRenderer );//update screen
+			start++;
+			SDL_Delay(20);
+		}
+	}
+	render(student);
+	previous_value = current_value;
+}
+
+void healthbar_class::update(professor_class professor){
+	current_value = professor.health;
+	int end = ( current_value * 100 ) / max_value;
+	int start = ( previous_value * 100 ) / max_value;
+	if(end < start){
+		
+		while(start != end){
+			for(int i=0;i<start;i++){
+				hp[i] = true;
+			}
+			for(int i=start;i<100;i++){
+				hp[i] = false;
+			}
+			battlescene_render(); 
+			render();
+			SDL_RenderPresent( gRenderer );//update screen
+			start--;
+			SDL_Delay(50);
+		}
+	}
+	else if(end > start){
+		while(start != end){
+			for(int i=0;i<start;i++){
+				hp[i] = true;
+			}
+			for(int i=start;i<100;i++){
+				hp[i] = false;
+			}
+			battlescene_render(); 
+			render();
 			SDL_RenderPresent( gRenderer );//update screen
 			start++;
 			SDL_Delay(20);

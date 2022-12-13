@@ -4,7 +4,14 @@
 #include "character.h"
 #include <ctime>
 #include <cstdlib>
-
+#ifndef _ATTRIBUTE
+#define _ATTRIBUTE
+enum attribute{
+	fire,
+	water,
+	grass
+};
+#endif
 class cards
 {
     friend void cards_initialize(cards deck[])
@@ -164,6 +171,8 @@ class cards
             enemy_hit_rate = 0.00;
             enemy_avoid_rate = 0.00;
         }
+        attribute get_attribute() {return nature;}
+        int get_attack() { return self_attack;	}
     private:
         attribute nature;
         int attack = 0;
@@ -181,48 +190,5 @@ class cards
         double enemy_avoid_rate = 0.00;
 };
 
-cards** deck_initialize(cards all[])
-{
-    int i, j, random_id;
-    cards **deck;
-    deck = new cards* [2];
-
-    for(i = 0 ; i < 2 ; i++)
-    {
-        deck[i] = new cards [3];
-    }
-
-    srand(time(0));
-
-    for(i = 0 ; i < 2 ; i++)
-    {
-        for(j = 0 ; j < 3 ; j++)
-        {
-            random_id = rand() % 21;
-            deck[i][j] = all[random_id];
-        }
-    }
-
-    return deck;
-}
-
-
-
-void card_draw(cards *deck[], cards all[])
-{
-    int i, j;
-    srand(time(0));
-    
-    for(i = 0 ; i < 2 ; i++)
-    {
-        for(j = 0 ; j < 3 ; j++)
-        {
-            if(deck[i][j].id == -1)
-            {
-                deck[i][j] = (all[rand() % 21]);
-            }
-        }
-    }
-}
 
 #endif

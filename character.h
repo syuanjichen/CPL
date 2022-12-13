@@ -1,8 +1,6 @@
 #ifndef _CHARACTER_H
 #define _CHARACTER_H
 
-
-
 #ifndef _ATTRIBUTE
 #define _ATTRIBUTE
 enum attribute{
@@ -11,6 +9,7 @@ enum attribute{
 	grass
 };
 #endif
+class cards;
 
 enum effect{
 	health_to_attack,	// attack increases while losing health
@@ -60,6 +59,7 @@ class professor_class : public character_class{						//class of enemy
 		professor_class(int a = 0);
 		attribute get_attribute() { return element; }	//return attribute 
 		void do_effect( student_class student);
+		void hurt(cards);
 		//void hurt(double);							//this is lee's job
 };
 

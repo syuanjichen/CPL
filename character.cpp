@@ -1,6 +1,6 @@
 #include "character.h"
-
-
+#include "cards.h"
+extern student_class student;
 
 student_class::student_class(){
 	health_limit = 100;
@@ -40,12 +40,12 @@ void student_class::hurt(double a){
 	a = a * ( 100 / (100 + defence) );
 	int damage = (int)a;
 		
-	if(damage > ( health + shield ) ){
+	if(damage >= ( health + shield ) ){
 		shield = 0;
 		health = 0;
 		living = false;
 	}
-	else if(damage > shield){
+	else if(damage >= shield){
 		damage -= shield;
 		shield = 0;
 		health -= damage;
@@ -53,6 +53,51 @@ void student_class::hurt(double a){
 	}
 	else if(damage < shield){
 		shield -= damage;
+	}
+}
+
+void professor_class::hurt(cards card){
+	int damage;
+	if(element == fire){
+		if(card.get_attribute() == fire ){
+			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+		else if(card.get_attribute() == water){
+			damage = 1.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+		else{
+			damage = 0.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+	}
+	else if(element == water){
+		if(card.get_attribute() == fire ){
+			damage = 0.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+		else if(card.get_attribute() == water){
+			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+		else{
+			damage = 1.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+	}
+	else if(element == grass){
+		if(card.get_attribute() == fire ){
+			damage = 1.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+		else if(card.get_attribute() == water){
+			damage = 0.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+		else{
+			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+		}
+	}
+	damage *= student.attack_rate;
+	if(damage >= health){
+		health = 0;
+		living = false;
+	}
+	else{
+		health -= damage;
 	}
 }
 
