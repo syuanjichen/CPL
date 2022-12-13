@@ -225,6 +225,7 @@ bool init()
 			printf( "Failed to load chinese font! SDL_ttf Error: %s\n", TTF_GetError() );
 			success = false;
 		}
+		
 	}
 	
 

@@ -1,5 +1,5 @@
 #include "character.h"
-#include <iostream>
+
 
 
 student_class::student_class(){
@@ -39,7 +39,6 @@ void student_class::hurt(double a){
 	
 	a = a * ( 100 / (100 + defence) );
 	int damage = (int)a;
-	std::cout<<"damage = "<<damage<<std::endl;
 		
 	if(damage > ( health + shield ) ){
 		shield = 0;
@@ -49,9 +48,7 @@ void student_class::hurt(double a){
 	else if(damage > shield){
 		damage -= shield;
 		shield = 0;
-		std::cout<<"damage = "<<damage<<std::endl;
 		health -= damage;
-		std::cout<<"health = "<<health<<std::endl;
 		
 	}
 	else if(damage < shield){
