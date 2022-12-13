@@ -3,6 +3,8 @@
 
 extern LTexture shield_texture;
 extern void battlescene_render();
+extern void professor_name_render();
+extern int stage;
 
 healthbar_class::healthbar_class(int x0, int y0, student_class student){
 	x = x0;
@@ -63,6 +65,7 @@ void healthbar_class::render(){
 			SDL_RenderFillRect( gRenderer, &rect );
 		}
 	}
+	professor_name_render();
 }
 void healthbar_class::render(student_class student){
 	SDL_Rect bgRect = { x-38 , y-5 , 663 , 40 };

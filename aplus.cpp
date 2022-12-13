@@ -60,6 +60,8 @@ TTF_Font *gFont = NULL;
 
 TTF_Font *chinesefont = NULL;
 
+TTF_Font *namefont = NULL;
+
 cards all_card[21], **battle_deck;
 
 
@@ -91,6 +93,8 @@ int draw_paper();
 
 void card_graph_render();
 
+void professor_name_render();
+
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
@@ -108,6 +112,7 @@ SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
 SDL_Color get_f_text_color = {0xFF,0xFF,0xFF};
 SDL_Color quitgame_button_color = {0x00,0x00,0x00};
 SDL_Color godsound_color = {255,239,69};
+SDL_Color prof_name_color = {255,0,0};
 
 LTexture start_texture ;  				//texture of start scene
 LTexture explanation_texture ;			//texture of explanation scene
@@ -135,6 +140,7 @@ LTexture magicball;
 LTexture noschool_subtitle[3];
 LTexture wasted; 
 LTexture shield_texture; 
+LTexture professor_name[6];
 
 student_class student;
 professor_class professor[6];
@@ -153,6 +159,11 @@ Uint16 get_aplus_text_1[] = {0x6211,0x8214};
 Uint16 noschool_text_0[] = {0x53ef,0x60e1,0xff0c,0x4f86,0x751f,0x9084,0x60f3,0x8b80,0x53f0,0x5927,0x554a,0xff01};
 Uint16 noschool_text_1[] = {0x8b0e,0x4e4b,0x8072,0xff1a,0x52c7,0x8005,0xff0c,0x6b64,0x5730,0x975e,0x6c5d,0x4e4b,0x7d42,0x7109,0xff0c,0x7576,0x596e,0x8d77,0x518d,0x6230,0x3002};
 Uint16 noschool_text_2[] = {0x554a,0xff1f,0x54a6,0xff1f,0x86e4,0xff1f,0x55ef,0xff1f,0x0000,0x0000};
+Uint16 professor_name_text_1[] = {0x7ba1,0x9662,0x7334,0x0000,0x0000};
+Uint16 professor_name_text_2[] = {0x7ba1,0x9662,0x7334,0xff0c,0x4f46,0x662f,0x5f88,0x5feb,0x0000,0x0000};
+Uint16 professor_name_text_3[] = {0x706b,0x7206,0x6559,0x6388,0x0000,0x0000};
+Uint16 professor_name_text_4[] = {0x8001,0x5a46,0x0000,0x0000};
+Uint16 professor_name_text_5[] = {0x6bc0,0x6ec5,0x4e4b,0x795e,0xff0e,0x68c4,0x5929,0x5e1d,0x0000,0x0000};
 
 bool init()
 {
@@ -223,6 +234,12 @@ bool init()
 		if( chinesefont == NULL )
 		{
 			printf( "Failed to load chinese font! SDL_ttf Error: %s\n", TTF_GetError() );
+			success = false;
+		}
+		namefont = TTF_OpenFont( "img/Pixel.ttf", 30 );
+		if( namefont == NULL )
+		{
+			printf( "Failed to load name font! SDL_ttf Error: %s\n", TTF_GetError() );
 			success = false;
 		}
 		
@@ -364,6 +381,16 @@ bool loadMedia()
 	if( !shield_texture.loadFromFile( "img/shield.bmp"  ) ){
 		printf( "Failed to load shield texture!\n" );		success = false;	}		
 	shield_texture.setBlendMode(SDL_BLENDMODE_BLEND);		shield_texture.setAlpha(230);
+	if( !professor_name[1].loadFromRenderedText_name( professor_name_text_1 , prof_name_color ) ){
+		printf( "Failed to load professor_name1!\n" );	success = false;	}
+	if( !professor_name[2].loadFromRenderedText_name( professor_name_text_2 , prof_name_color ) ){
+		printf( "Failed to load professor_name2 texture!\n" );	success = false;	}
+	if( !professor_name[3].loadFromRenderedText_name( professor_name_text_3 , prof_name_color ) ){
+		printf( "Failed to load professor_name3 texture!\n" );	success = false;	}
+	if( !professor_name[4].loadFromRenderedText_name( professor_name_text_4 , prof_name_color ) ){
+		printf( "Failed to load professor_name4 texture!\n" );	success = false;	}
+	if( !professor_name[5].loadFromRenderedText_name( professor_name_text_5 , prof_name_color ) ){
+		printf( "Failed to load professor_name5 texture!\n" );	success = false;	}
 	
 	return success;
 }
@@ -404,6 +431,8 @@ void close()
 	conti_font = NULL;
 	TTF_CloseFont( chinesefont );
 	chinesefont = NULL;
+	TTF_CloseFont( namefont );
+	namefont = NULL;
 	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
@@ -932,5 +961,12 @@ int draw_paper(){
     }
     drawn_paper[stage] = true;
     return the_drawn_paper;
+}
+
+void professor_name_render(){
+	SDL_Rect Rect = {(1440-professor_name[stage].getWidth())/2, 5 , professor_name[stage].getWidth() , professor_name[stage].getHeight() };
+//	SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
+//	SDL_RenderFillRect( gRenderer , &Rect );
+	professor_name[stage].render( Rect.x, Rect.y, &Rect);
 }
 
