@@ -21,7 +21,7 @@ int block_y = SCREEN_HEIGHT/9;
 bool gatcha_played_animation[6] = {false};
 bool noschool_played = false;
 bool get_aplus_played = false;
-bool get_f_played = false;
+bool get_f_played = false, round_attacked = false;
 bool drawn_paper[6] = {false};
 int the_paper;//the paper drawn in every stage
 
@@ -36,13 +36,14 @@ enum game_state {				//game states
 	get_f,						//student defeated boss but did not get all paper
 	get_aplus					//student defeated boss and got all paper
 };
-game_state state = start;	  //define state as the variable indicates current game state
+game_state state = student_attacking;	  //define state as the variable indicates current game state
 int stage = 1;				  //stage indicate which stage now is in
 bool paper[3] = {};
 int paper_num = 0;
 int yes;
 int no;
 stringstream student_health_text;
+stringstream damage_text;
 	
 bool init();				  //Starts up SDL and creates window
 
@@ -63,6 +64,8 @@ TTF_Font *gFont = NULL;
 TTF_Font *chinesefont = NULL;
 
 TTF_Font *namefont = NULL;
+
+TTF_Font *damagefont = NULL;
 
 cards all_card[21], **battle_deck;
 
@@ -105,6 +108,10 @@ void card_draw(cards *deck[], cards all[]);
 
 void stud_health_render();
 
+void damage_render(int x, int y,bool init = false);
+
+void professor_function();
+
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
@@ -123,6 +130,7 @@ SDL_Color get_f_text_color = {0xFF,0xFF,0xFF};
 SDL_Color quitgame_button_color = {0x00,0x00,0x00};
 SDL_Color godsound_color = {255,239,69};
 SDL_Color prof_name_color = {255,0,0};
+SDL_Color colll = {180,50,200}; // color of damage text
 
 LTexture start_texture ;  				//texture of start scene
 LTexture explanation_texture ;			//texture of explanation scene
@@ -156,6 +164,7 @@ LTexture magicball_ring_1;
 LTexture magicball_ring_2;
 LTexture student_health_bg; 
 LTexture student_health_text_texture;
+LTexture damage_text_texture;
 
 student_class student;
 professor_class professor[6];
@@ -257,7 +266,12 @@ bool init()
 			printf( "Failed to load name font! SDL_ttf Error: %s\n", TTF_GetError() );
 			success = false;
 		}
-		
+		damagefont = TTF_OpenFont( "img/Golden_Age.ttf", 60 );
+		if( namefont == NULL )
+		{
+			printf( "Failed to load damage font! SDL_ttf Error: %s\n", TTF_GetError() );
+			success = false;
+		}
 	}
 	
 
@@ -461,6 +475,8 @@ void close()
 	chinesefont = NULL;
 	TTF_CloseFont( namefont );
 	namefont = NULL;
+	TTF_CloseFont( damagefont );
+	damagefont = NULL;
 	
 	//Destroy window	
 	SDL_DestroyRenderer( gRenderer );
@@ -544,7 +560,9 @@ int main( int argc, char* args[] )
 			professor[5] = professor_class(0);
 			
 			for(int i=0;i<6;i++)	{ professor_healthbar[i] = healthbar_class( block_x * 8 - 332+38 , 5 , professor[i] ); }
-			
+			student.burning = true;
+			professor[stage].stunning = true;
+			student.stunning = true;
 			
 			//While application is running
 			while( !quit )
@@ -588,6 +606,7 @@ int main( int argc, char* args[] )
 						}
 						else if( state == student_attacking ){
 							//if mouse is on card: show detail
+							if(professor[stage].stunning){ professor[stage].stunning = false; }
 							if(!student.stunning && probability(student.hit_rate,professor[stage].avoid_rate) == 1){
 								stud_attack_animation();
 								SDL_Delay(300);
@@ -601,45 +620,18 @@ int main( int argc, char* args[] )
 								}
 								
 								//deal with card effect
-								
-								if(professor[stage].alive() == false){
-									
-									state = gatcha;
 								}
-								else{
-									state = professor_attacking;
-								}
+							if(professor[stage].alive() == false){
 								
+								state = gatcha;
 							}
-							
-							
-							
-							
-							
-							
-							
+							else{
+								state = professor_attacking;
+							}
+
 						}
 						else if( state == professor_attacking ){
 							
-							if(!professor[stage].stunning ){
-								prof_attack_animation();
-								student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
-								professor[stage].do_effect(student);
-							}
-							SDL_Delay(300);
-							student_healthbar.update(student);
-							SDL_Delay(300);
-							if( student.burning == true){ student.hurt(3); }{
-								student_healthbar.update(student);
-								SDL_Delay(300);
-							}
-							if( student.alive() == false ){
-								
-								state = no_school; 
-							}
-							else{
-								state = student_attacking;
-							}
 						}
 					
 						
@@ -778,7 +770,14 @@ void background_texture_render(){
 	}
 	else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 		battlescene_render();
-		
+		if(state == student_attacking && round_attacked == true){
+			round_attacked = false;
+		}
+		if (state == professor_attacking && round_attacked == false){
+			round_attacked = true;
+			professor_function();
+		}
+		 
 	}
 	else if(state == gatcha){
 		
@@ -985,6 +984,9 @@ void game_init(){
 	get_f_played = false;
 	noschool_played = false;
 	paper_num = 0;
+	damage_render(0,0,true);
+	for(int i=0;i<6;i++){professor_healthbar[stage].init(professor[stage]);}
+	student_healthbar.init(student);
 }
 
 int draw_paper(){
@@ -1081,13 +1083,19 @@ void stud_attack_animation(){
 		SDL_RenderPresent( gRenderer );
 		SDL_Delay(5);
 	}
+	int xpos = rand()%300 + 721 ;
+	int ypos = rand()%200 + 91  ;
+	int left = rand() % 2;
 	for(int i=0;i<20;i++){
+		background_texture_render();
 		professor_healthbar[stage].render();
 		magicball_center.render(ballR.x,ballR.y,&ballR);
 		magicball_ring_1.render(ringR.x,ringR.y,&ringR  ,  deg);
 		magicball_ring_2.render(ringR.x,ringR.y,&ringR  , -deg);
+		if(left)	damage_render(xpos-2*i,ypos-30*i+2*i*i);
+		else		damage_render(xpos+2*i,ypos-30*i+2*i*i);
 		SDL_RenderPresent( gRenderer );
-		SDL_Delay(20);
+		SDL_Delay(30);
 		
 	}
 }
@@ -1101,5 +1109,49 @@ void stud_health_render(){
 	student_health_bg.render(HPbg.x,HPbg.y,&HPbg);
 	SDL_Rect healthtextrect = {HPbg.x+32,HPbg.y+4,student_health_text_texture.getWidth(),student_health_text_texture.getHeight()};
 	student_health_text_texture.render(healthtextrect.x,healthtextrect.y,&healthtextrect);
+}
+
+void damage_render(int x,int y,bool init){
+	static int previous[6] = {professor[0].get_health_limit(), professor[1].get_health_limit(), professor[2].get_health_limit(), professor[3].get_health_limit(), professor[4].get_health_limit(), professor[5].get_health_limit()};
+	static int current[6] = {professor[0].get_health_limit(), professor[1].get_health_limit(), professor[2].get_health_limit(), professor[3].get_health_limit(), professor[4].get_health_limit(), professor[5].get_health_limit()};
+	if(!init){
+		current[stage] = professor[stage].health;
+		damage_text.str("");
+		damage_text << "-" << previous[stage] - current[stage];
+		if (!damage_text_texture.loadFromRenderedText_damage( damage_text.str().c_str(), colll ) ){
+			printf("Unable to render damage_text_texture!\n");	}
+		SDL_Rect damageR = { x ,  y , damage_text_texture.getWidth(), damage_text_texture.getHeight()};
+		damage_text_texture.render(damageR.x,damageR.y,&damageR);
+	}
+	else{
+		for(int i=0;i<6;i++){
+			previous[i] = current[i] = professor[i].get_health_limit();
+		}
+	}
+	
+}
+
+void professor_function(){
+	if(student.stunning){ student.stunning = false; }
+	if(!professor[stage].stunning ){
+		prof_attack_animation();
+		student.hurt( probability( professor[ stage ].hit_rate, student.avoid_rate ) * professor[ stage ].attack );
+		professor[stage].do_effect(student);
+	}
+	SDL_Delay(300);
+	student_healthbar.update(student);
+	SDL_Delay(300);
+	if( student.burning == true){ student.hurt(3); }{
+		student_healthbar.update(student);
+		SDL_Delay(300);
+	}
+	if( student.alive() == false ){
+		
+		state = no_school; 
+	}
+	else{
+		state = student_attacking;
+	}
+	return;
 }
 
