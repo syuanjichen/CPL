@@ -3,6 +3,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <cstdio>
+#include <sstream>
 #include <string>
 #include <iostream>
 #include <ctime>
@@ -41,6 +42,7 @@ bool paper[3] = {};
 int paper_num = 0;
 int yes;
 int no;
+stringstream student_health_text;
 	
 bool init();				  //Starts up SDL and creates window
 
@@ -101,6 +103,8 @@ cards** deck_initialize(cards all[]);
 
 void card_draw(cards *deck[], cards all[]);
 
+void stud_health_render();
+
 SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
 SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
@@ -149,7 +153,9 @@ LTexture shield_texture;
 LTexture professor_name[6];
 LTexture magicball_center;
 LTexture magicball_ring_1;
-LTexture magicball_ring_2; 
+LTexture magicball_ring_2;
+LTexture student_health_bg; 
+LTexture student_health_text_texture;
 
 student_class student;
 professor_class professor[6];
@@ -227,7 +233,7 @@ bool init()
 	    success = false;
 	}
 	else{
-		gFont = TTF_OpenFont( "img/lazy.ttf", 28 );
+		gFont = TTF_OpenFont( "img/Pixel.ttf", 28 );
 	    if( gFont == NULL )
 		{
 			printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
@@ -406,6 +412,8 @@ bool loadMedia()
 		printf( "Failed to load magic_ring_1 texture!\n" );		success = false;	}
 	if( !magicball_ring_2.loadFromFile( "img/magic_ring_2.bmp"  ) ){
 		printf( "Failed to load magic_ring_2 texture!\n" );		success = false;	}	
+	if( !student_health_bg.loadFromFile( "img/stud_health_bg.bmp"  ) ){
+		printf( "Failed to load student_health_bg texture!\n" );		success = false;	}
 
 	return success;
 }
@@ -443,6 +451,7 @@ void close()
 	magicball_center.free();
 	magicball_ring_1.free();
 	magicball_ring_2.free(); 
+	student_health_bg.free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -579,7 +588,6 @@ int main( int argc, char* args[] )
 						}
 						else if( state == student_attacking ){
 							//if mouse is on card: show detail
-							professor[stage].attack = 50;
 							if(!student.stunning && probability(student.hit_rate,professor[stage].avoid_rate) == 1){
 								stud_attack_animation();
 								SDL_Delay(300);
@@ -731,7 +739,7 @@ void battlescene_render(){
 	papertable_render();
 	professor_healthbar[stage].render();	//render healthbar
 	student_healthbar.render(student);				//render healthbar
-	//if (student.shield){ shield_texture.render( shieldRect.x , shieldRect.y , &shieldRect ); }
+	stud_health_render();
 }
 
 void continue_button_render(){
@@ -1084,5 +1092,14 @@ void stud_attack_animation(){
 	}
 }
 
-
+void stud_health_render(){
+	student_health_text.str("");
+    student_health_text << "HP: " << student.health;
+	if( !student_health_text_texture.loadFromRenderedText( student_health_text.str().c_str(), continue_button_color ) )
+    {  printf( "Unable to render student_health_text_texture!\n" );}
+	SDL_Rect HPbg = {block_x * 5-200, 40 + block_y * 4,160,40};
+	student_health_bg.render(HPbg.x,HPbg.y,&HPbg);
+	SDL_Rect healthtextrect = {HPbg.x+32,HPbg.y+4,student_health_text_texture.getWidth(),student_health_text_texture.getHeight()};
+	student_health_text_texture.render(healthtextrect.x,healthtextrect.y,&healthtextrect);
+}
 
