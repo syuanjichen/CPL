@@ -172,7 +172,8 @@ class cards
             enemy_avoid_rate = 0.00;
         }
         attribute get_attribute() {return nature;}
-        int get_attack() { return self_attack;	}
+        int get_attack() { return attack;	}
+        void set_attack(int value) { attack = value;}
     private:
         attribute nature;
         int attack = 0;

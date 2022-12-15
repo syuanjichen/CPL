@@ -1,5 +1,6 @@
 #include "character.h"
 #include "cards.h"
+#include <bits/stdc++.h>
 extern student_class student;
 
 student_class::student_class(){
@@ -56,8 +57,8 @@ void student_class::hurt(double a){
 	}
 }
 
-void professor_class::hurt(cards card){
-	int damage;
+int professor_class::hurt(cards card){
+	double damage;
 	if(element == fire){
 		if(card.get_attribute() == fire ){
 			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
@@ -92,13 +93,16 @@ void professor_class::hurt(cards card){
 		}
 	}
 	damage *= student.attack_rate;
+	std::cout<<"Damage = "<<damage<<std::endl;
 	if(damage >= health){
 		health = 0;
 		living = false;
 	}
 	else{
-		health -= damage;
+		health -= int(damage);
 	}
+	
+	return (int)damage;
 }
 
 professor_class::professor_class(int a){
@@ -111,7 +115,7 @@ professor_class::professor_class(int a){
 			health = health_limit;
 			shield = 0;
 			attack = 5;
-			defence = 400;
+			defence = 0;
 			hit_rate = 0.95;
 			avoid_rate = 0;
 			burning = false;
@@ -129,7 +133,7 @@ professor_class::professor_class(int a){
 			shield = 0;
 			attack = 15;
 			defence = 50;
-			hit_rate = 0.9;
+			hit_rate = 1.00;
 			avoid_rate = 0.95;
 			burning = false;
 			stunning = false;
@@ -147,7 +151,7 @@ professor_class::professor_class(int a){
 			shield = 0;
 			attack = 10;
 			defence = 150;
-			hit_rate = 0.9;
+			hit_rate = 0.96;
 			avoid_rate = 0.1;
 			burning = false;
 			stunning = false;
@@ -166,7 +170,7 @@ professor_class::professor_class(int a){
 			shield = 0;
 			attack = 20;
 			defence = 50;
-			hit_rate = 0.9;
+			hit_rate = 0.90;
 			avoid_rate = 0.1;
 			burning = false;
 			stunning = false;
@@ -183,7 +187,7 @@ professor_class::professor_class(int a){
 			shield = 0;
 			attack = 20;
 			defence = 50;
-			hit_rate = 0.9;
+			hit_rate = 1.00;
 			avoid_rate = 0.1;
 			burning = false;
 			stunning = false;
@@ -197,47 +201,35 @@ professor_class::professor_class(int a){
 void professor_class::do_effect(student_class student){
 	switch ( special ){
 		case health_to_attack:
-		
 		break;
 
 		case swifty:
-		
 		break;
 		
 		case armored:
 		
 		break;
 		
-		
 		case stun:
-		if(student.stunning == false && this->stun_counter >= 2){
+		if(this->stun_counter >= 2){
 			student.stunning = true;
 			this->stun_counter = 0;
 		}
 		else{
-			if(this->stun_counter >= 2)
-				this->stun_counter = 0;
-			else{
-				this->stun_counter +=1;
-				if (student.stunning == true){ student.stunning = false;}
-			}
+			this->stun_counter +=1;
 		}
 		
 		
 		break;
 		
 		case firing:
-		if(student.burning == false && this->ignite_counter >= 5){
+		if(this->ignite_counter >= 5){
 			student.burning = true;
 			this->ignite_counter = 0;
 		}
 		else{
-			if(this->ignite_counter >= 5)
-				this->ignite_counter = 0;
-			else
-				this->ignite_counter +=1;
+			this->ignite_counter +=1;
 		}
-		
 		break;
 		
 	}

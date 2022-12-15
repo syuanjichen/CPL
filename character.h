@@ -59,7 +59,7 @@ class professor_class : public character_class{						//class of enemy
 		professor_class(int a = 0);
 		attribute get_attribute() { return element; }	//return attribute 
 		void do_effect( student_class student);
-		void hurt(cards);
+		int hurt(cards);
 		//void hurt(double);							//this is lee's job
 };
 
