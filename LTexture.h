@@ -30,6 +30,8 @@ class LTexture
 		bool loadFromRenderedText_chinese( Uint16* text, SDL_Color textColor );
 		bool loadFromRenderedText_name( Uint16* text, SDL_Color textColor );
 		bool loadFromRenderedText_damage( std::string , SDL_Color );
+		bool loadFromRenderedText_title( std::string , SDL_Color );
+		bool loadFromRenderedText_titleinside( std::string , SDL_Color );
 		#endif
 		
 		//Deallocates texture

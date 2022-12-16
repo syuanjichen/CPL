@@ -94,7 +94,6 @@ int professor_class::hurt(cards card){
 	}
 	damage += student.attack;
 	damage *= student.attack_rate;
-	std::cout<<"Damage = "<<damage<<std::endl;
 	if(damage >= health){
 		health = 0;
 		living = false;
@@ -116,9 +115,9 @@ professor_class::professor_class(int a){
 			health = health_limit;
 			shield = 0;
 			attack = 5;
-			defence = 0;
-			hit_rate = 0.95;
-			avoid_rate = 0;
+			defence = 600;
+			hit_rate = 1.00;
+			avoid_rate = 0.3;
 			burning = false;
 			stunning = false;
 			special = armored;
@@ -126,16 +125,16 @@ professor_class::professor_class(int a){
 			stun_counter = 0;
 			break;	
 		case 2:
-			health_limit = 300;
+			health_limit = 400;
 			difficulty = 2;
 			element = grass;
 			living = true;
 			health = health_limit;
 			shield = 0;
 			attack = 15;
-			defence = 50;
+			defence = 150;
 			hit_rate = 1.00;
-			avoid_rate = 0.95;
+			avoid_rate = 1.00;
 			burning = false;
 			stunning = false;
 			special = swifty;
@@ -153,7 +152,7 @@ professor_class::professor_class(int a){
 			attack = 10;
 			defence = 150;
 			hit_rate = 0.96;
-			avoid_rate = 0.1;
+			avoid_rate = 0.2;
 			burning = false;
 			stunning = false;
 			special = firing;
@@ -170,9 +169,9 @@ professor_class::professor_class(int a){
 			health = health_limit;
 			shield = 0;
 			attack = 20;
-			defence = 50;
+			defence = 250;
 			hit_rate = 0.90;
-			avoid_rate = 0.1;
+			avoid_rate = 0.3;
 			burning = false;
 			stunning = false;
 			special = stun;
@@ -180,16 +179,16 @@ professor_class::professor_class(int a){
 			stun_counter = 3;
 			break;
 		case 0:
-			health_limit = 500;
+			health_limit = 700;
 			difficulty = 10;
-			element = grass;
+			element = water;
 			living = true;
 			health = health_limit;
 			shield = 0;
 			attack = 20;
-			defence = 50;
+			defence = 350;
 			hit_rate = 1.00;
-			avoid_rate = 0.1;
+			avoid_rate = 0.2;
 			burning = false;
 			stunning = false;
 			special = health_to_attack;

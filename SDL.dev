@@ -1,7 +1,7 @@
 [Project]
 FileName=SDL.dev
 Name=SDL
-Type=1
+Type=0
 Ver=2
 ObjFiles=
 Includes=SDL2-2.24.2\x86_64-w64-mingw32\include;SDL2-2.24.2\x86_64-w64-mingw32\include\SDL2;SDL_bgi-2.6.0\src;SDL2_mixer-2.6.2\x86_64-w64-mingw32\include\SDL2;SDL2_image-2.6.2\x86_64-w64-mingw32\include\SDL2;SDL2_ttf-2.20.1\x86_64-w64-mingw32\include\SDL2

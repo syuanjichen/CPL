@@ -13,6 +13,10 @@ extern TTF_Font *namefont;
 
 extern TTF_Font *damagefont ;
 
+extern TTF_Font *titlefont ;
+
+extern TTF_Font *titleinsidefont ;
+
 LTexture::LTexture()
 {
 	//Initialize
@@ -215,6 +219,74 @@ bool LTexture::loadFromRenderedText_name( Uint16* text, SDL_Color textColor )
 	if( textSurface == NULL )
 	{
 		printf( "Unable to render chinese text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+	}
+	else
+	{
+		//Create texture from surface pixels
+        mTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
+		if( mTexture == NULL )
+		{
+			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface( textSurface );
+	}
+	
+	//Return success
+	return mTexture != NULL;
+}
+
+bool LTexture::loadFromRenderedText_title( std::string textureText, SDL_Color textColor )
+{
+	//Get rid of preexisting texture
+	free();
+	
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid( titlefont, textureText.c_str(), textColor );
+	if( textSurface == NULL )
+	{
+		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+	}
+	else
+	{
+		//Create texture from surface pixels
+        mTexture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
+		if( mTexture == NULL )
+		{
+			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface( textSurface );
+	}
+	
+	//Return success
+	return mTexture != NULL;
+}
+
+bool LTexture::loadFromRenderedText_titleinside( std::string textureText, SDL_Color textColor )
+{
+	//Get rid of preexisting texture
+	free();
+	
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid( titleinsidefont, textureText.c_str(), textColor );
+	if( textSurface == NULL )
+	{
+		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
 	}
 	else
 	{

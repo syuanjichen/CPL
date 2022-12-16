@@ -130,10 +130,10 @@ void healthbar_class::update(professor_class professor){
 	if(end < start){
 		
 		while(start != end){
-			for(int i=0;i<start;i++){
+			for(int i=0;i<start-1;i++){
 				hp[i] = true;
 			}
-			for(int i=start;i<100;i++){
+			for(int i=start-1;i<100;i++){
 				hp[i] = false;
 			}
 			battlescene_render(); 
