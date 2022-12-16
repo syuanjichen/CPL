@@ -6,7 +6,7 @@ extern student_class student;
 student_class::student_class(){
 	health_limit = 100;
 	living = true;
-	
+	attack = 0;
 	health = 100;
 	shield = 0;
 	defence = 0;
@@ -92,6 +92,7 @@ int professor_class::hurt(cards card){
 			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
 		}
 	}
+	damage += student.attack;
 	damage *= student.attack_rate;
 	std::cout<<"Damage = "<<damage<<std::endl;
 	if(damage >= health){

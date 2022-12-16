@@ -38,6 +38,7 @@ class character_class{
 
 class student_class : public character_class{						// class of the main character (student) 
 	public:
+		int attack;
 		double attack_rate;
 		
 		student_class();

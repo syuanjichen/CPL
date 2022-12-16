@@ -8,6 +8,7 @@
 #include "LTexture.h"
 #include "healthbar.h"
 #include "cards.h" 
+#include "button.h" 
 #define PI 3.14159265358979323846
 using namespace std;
 const int SCREEN_WIDTH = 1440;  //Screen dimension constants
@@ -22,6 +23,7 @@ bool get_aplus_played = false;
 bool get_f_played = false, round_attacked = false;
 bool shown_explanation[6] = {false};
 bool drawn_paper[6] = {false};
+bool start_attacking = false;
 
 int the_paper;//the paper drawn in every stage
 Mix_Music *OPmusic = NULL;
@@ -32,11 +34,18 @@ Mix_Chunk *Attackmusic3 = NULL;
 Mix_Chunk *Attackmusic4 = NULL;
 Mix_Chunk *Hitmusic1 = NULL;
 Mix_Chunk *Hitmusic2 = NULL;
+Mix_Chunk *Hitmusic3 = NULL;
+Mix_Chunk *Hitmusic4 = NULL;
+Mix_Chunk *Hitmusic5 = NULL;
 Mix_Chunk *Jumpmusic = NULL;
 Mix_Chunk *Getpapermusic = NULL;
 Mix_Chunk *Diemusic = NULL;
 Mix_Chunk *Clearmusic = NULL;
- 
+Mix_Chunk *Gururinpo = NULL;
+Mix_Chunk *Stunmusic = NULL;
+
+LButton gButtons[6];
+const int TOTAL_BUTTONS = 5;
 
 enum game_state {				//game states
 	start,						//just entered game
@@ -83,6 +92,7 @@ TTF_Font *damagefont = NULL;
 cards all_card[21], **battle_deck;
 
 int probability(double hit_rate, double avoid_rate);
+void card_sprite_preset();
 void papertable_render();
 void battlescene_render();
 void continue_button_render();
@@ -97,7 +107,7 @@ void game_init();
 int draw_paper();
 void card_graph_render();
 void professor_name_render();
-void stud_attack_animation();
+void stud_attack_animation( cards* );
 cards** deck_initialize(cards all[]);
 void card_draw(cards *deck[], cards all[]);
 void stud_health_render();
@@ -328,48 +338,69 @@ bool loadMedia()
 		printf( "Failed to load stage 4 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[5].loadFromFile( "img/stage_background_5.bmp" ) ){
 		printf( "Failed to load stage 5 bg texture!\n" );		success = false;	}
-	if( !card_texture[0].loadFromFile("img/card_06.bmp")){
+	if( !card_texture[0].loadFromFile("img/card_00.bmp")){
 		printf("Failed to load card_00 texture!\n");	success = false;}
-	if( !card_texture[1].loadFromFile("img/card_06.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[1].loadFromFile("img/card_01.bmp")){
 		printf("Failed to load card_01 texture!\n");	success = false;}
-	if( !card_texture[2].loadFromFile("img/card_06.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[2].loadFromFile("img/card_02.bmp")){
 		printf("Failed to load card_02 texture!\n");	success = false;}
-	if( !card_texture[3].loadFromFile("img/card_06.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[3].loadFromFile("img/card_03.bmp")){
 		printf("Failed to load card_03 texture!\n");	success = false;}
-	if( !card_texture[4].loadFromFile("img/card_06.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[4].loadFromFile("img/card_04.bmp")){
 		printf("Failed to load card_04 texture!\n");	success = false;}
-	if( !card_texture[5].loadFromFile("img/card_06.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[5].loadFromFile("img/card_05.bmp")){
 		printf("Failed to load card_05 texture!\n");	success = false;}
+	else{card_sprite_preset();}
 	if( !card_texture[6].loadFromFile("img/card_06.bmp")){
 		printf("Failed to load card_06 texture!\n");	success = false;}
-	if( !card_texture[7].loadFromFile("img/card_12.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[7].loadFromFile("img/card_07.bmp")){
 		printf("Failed to load card_07 texture!\n");	success = false;}
-	if( !card_texture[8].loadFromFile("img/card_12.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[8].loadFromFile("img/card_08.bmp")){
 		printf("Failed to load card_08 texture!\n");	success = false;}
-	if( !card_texture[9].loadFromFile("img/card_12.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[9].loadFromFile("img/card_09.bmp")){
 		printf("Failed to load card_09 texture!\n");	success = false;}
-	if( !card_texture[10].loadFromFile("img/card_12.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[10].loadFromFile("img/card_10.bmp")){
 		printf("Failed to load card_10 texture!\n");	success = false;}
-	if( !card_texture[11].loadFromFile("img/card_12.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[11].loadFromFile("img/card_11.bmp")){
 		printf("Failed to load card_11 texture!\n");	success = false;}
+	else{card_sprite_preset();}
 	if( !card_texture[12].loadFromFile("img/card_12.bmp")){
 		printf("Failed to load card_12 texture!\n");	success = false;}
-	if( !card_texture[13].loadFromFile("img/card_12.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[13].loadFromFile("img/card_13.bmp")){
 		printf("Failed to load card_13 texture!\n");	success = false;}
-	if( !card_texture[14].loadFromFile("img/card_17.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[14].loadFromFile("img/card_14.bmp")){
 		printf("Failed to load card_14 texture!\n");	success = false;}
-	if( !card_texture[15].loadFromFile("img/card_17.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[15].loadFromFile("img/card_15.bmp")){
 		printf("Failed to load card_15 texture!\n");	success = false;}
-	if( !card_texture[16].loadFromFile("img/card_17.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[16].loadFromFile("img/card_16.bmp")){
 		printf("Failed to load card_16 texture!\n");	success = false;}
+	else{card_sprite_preset();}
 	if( !card_texture[17].loadFromFile("img/card_17.bmp")){
 		printf("Failed to load card_17 texture!\n");	success = false;}
-	if( !card_texture[18].loadFromFile("img/card_17.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[18].loadFromFile("img/card_18.bmp")){
 		printf("Failed to load card_18 texture!\n");	success = false;}
-	if( !card_texture[19].loadFromFile("img/card_17.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[19].loadFromFile("img/card_19.bmp")){
 		printf("Failed to load card_19 texture!\n");	success = false;}
-	if( !card_texture[20].loadFromFile("img/card_17.bmp")){
+	else{card_sprite_preset();}
+	if( !card_texture[20].loadFromFile("img/card_20.bmp")){
 		printf("Failed to load card_20 texture!\n");	success = false;}
+	else{card_sprite_preset();}
 	if( !healthbar_texture.loadFromFile( "img/healthbar.bmp" ) ){
 		printf( "Failed to load healthbar texture!\n" );		success = false;	}
 	if( !paper_status_table_texture.loadFromFile( "img/testpaper_background.bmp" ) ){
@@ -463,6 +494,15 @@ bool loadMedia()
     Hitmusic2 = Mix_LoadWAV( "img/hit_sound_2.wav" );
     if( Hitmusic2 == NULL ){
         printf( "Failed to load Hitmusic2! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
+    Hitmusic3 = Mix_LoadWAV( "img/hit_sound_3.wav" );
+    if( Hitmusic3 == NULL ){
+        printf( "Failed to load Hitmusic3! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
+    Hitmusic4 = Mix_LoadWAV( "img/hit_sound_4.wav" );
+    if( Hitmusic4 == NULL ){
+        printf( "Failed to load Hitmusic4! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
+    Hitmusic5 = Mix_LoadWAV( "img/hit_sound_5.wav" );
+    if( Hitmusic5 == NULL ){
+        printf( "Failed to load Hitmusic5! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
     Jumpmusic = Mix_LoadWAV( "img/jump.wav" );
     if( Jumpmusic == NULL ){
         printf( "Failed to load Jumpmusic! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
@@ -475,6 +515,12 @@ bool loadMedia()
 	Clearmusic = Mix_LoadWAV( "img/stageclear.wav" );
     if( Clearmusic == NULL ){
         printf( "Failed to load Clearmusic! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
+    Gururinpo = Mix_LoadWAV( "img/gururinpo.wav" );
+    if( Gururinpo == NULL ){
+        printf( "Failed to load Clearmusic! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
+    Stunmusic = Mix_LoadWAV( "img/sleep.wav" );
+    if( Stunmusic == NULL ){
+        printf( "Failed to load Stunmusic! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
 	if( !dialogue[0].loadFromRenderedText_chinese( dialogue_text_1 ,get_f_text_color ) ){
         printf( "Failed to load dialogue text1 texture!\n" );	success = false;	}
     if( !dialogue[1].loadFromRenderedText_chinese( dialogue_text_2 ,get_f_text_color ) ){
@@ -670,6 +716,8 @@ int main( int argc, char* args[] )
 							
 							student.burning = false;			student.stunning = false;
 							professor[stage].burning = false;	professor[stage].stunning = false;
+							student.health = student.get_health_limit();
+							student_healthbar.init(student);
 							//tell player what ability that enemy posesses
 							if(e.type == SDL_KEYDOWN){
 								switch( e.key.keysym.sym ){
@@ -685,42 +733,73 @@ int main( int argc, char* args[] )
 							}
 						}
 						else if( state == student_attacking ){
-							//if mouse is on card: show detail
-							if(professor[stage].stunning){ professor[stage].stunning = false; }
-							if(!student.stunning){
-								int professor_hurt_damage = -1;			//the damage professor take
-								
-								stud_attack_animation(); //attack
-								cout<<"hit rate = "<<student.hit_rate<<" avoidrate = "<<professor[stage].avoid_rate <<endl;
-								if( probability(student.hit_rate,professor[stage].avoid_rate) == 1){
-									professor_hurt_damage = professor[stage].hurt(battle_deck[0][0]);	//professor get hurt 
-									render_damage_text(professor_hurt_damage);
-									professor_healthbar[stage].update(professor[stage]);
+							cards selected_card;
+							int row=-1,col=-1;
+							for(int i = 0 ; i < 6 ; i++){
+								gButtons[i].handleEvent(&e);
+							}
+							
+							if(e.type == SDL_MOUSEBUTTONUP ){
+								for(int i=0;i<6;i++){
+									if(gButtons[i].mouse_on == true){
+										selected_card = battle_deck[i/3][i%3];
+										start_attacking = true;
+										row = i/3;
+										col = i%3;
+										cout <<"row = "<< row <<" col = " << col <<endl;
+										break;
+									}
+								} 
+							}
+							if( start_attacking ){
+								if(!student.stunning){
+									int professor_hurt_damage = -1;			//the damage professor take
+									
+									card_effect(selected_card, professor[stage], student);
+									student_healthbar.update(student);
+									
+									stud_attack_animation( &selected_card ); //attack
+									
+									if( probability(student.hit_rate,professor[stage].avoid_rate) == 1){
+										professor_hurt_damage = professor[stage].hurt(selected_card);	//professor get hurt 
+										render_damage_text(professor_hurt_damage);
+										professor_healthbar[stage].update(professor[stage]);
+									}
+									else{
+										render_damage_text(professor_hurt_damage,false);
+									}
+									SDL_Delay(300);	
+									cout<<selected_card.get_attack()<<endl;	//for testing
+									
+									battle_deck[row][col].id = -1;
+									card_draw(battle_deck,  all_card);
+									
+									if( professor[stage].burning == true){ professor[stage].health -= 3; }{
+										professor_healthbar[stage].update(professor[stage]);
+										SDL_Delay(300);
+									}
+									
+									//deal with card effect
 								}
-								else{
-									render_damage_text(professor_hurt_damage,false);
-								}
-								SDL_Delay(300);	
-								cout<<battle_deck[0][0].get_attack()<<endl;	//
-								
-								if( professor[stage].burning == true){ professor[stage].health -= 3; }{
-									professor_healthbar[stage].update(professor[stage]);
-									SDL_Delay(300);
-								}
-								
-								//deal with card effect
-								}
-								else{
+								else{	//student is stunning
+									Mix_PlayChannel( -1, Stunmusic, 0 );
 									stun_animation(true);	//true means student is stunning
+									student.stunning = false; 
 								}
-							if(professor[stage].alive() == false){
-								Mix_PlayChannel( -1, Clearmusic, 0 );
-								state = gatcha;
+								
+								if(professor[stage].alive() == false){
+									Mix_PlayChannel( -1, Clearmusic, 0 );
+									state = gatcha;
+									start_attacking = false;
+								}
+								else{
+									state = professor_attacking;
+									start_attacking = false;
+								}
 							}
-							else{
-								state = professor_attacking;
-							}
-
+							
+							
+							
 						}
 						else if( state == professor_attacking ){
 							
@@ -789,22 +868,28 @@ int probability(double hit_rate, double avoid_rate){		//function of hitting of n
 	else						return 0 ;
 }
 
+void card_sprite_preset(){
+	for( int i = 0; i < BUTTON_SPRITE_TOTAL; ++i )
+	{
+		gSpriteClips[ i ].x = 0;
+		gSpriteClips[ i ].y = i * 160;
+		gSpriteClips[ i ].w = BUTTON_WIDTH;
+		gSpriteClips[ i ].h = BUTTON_HEIGHT;
+	}
+	//Set buttons in corners
+	gButtons[0].setPosition( 200, 430 );
+	gButtons[1].setPosition( 560, 430 );
+	gButtons[2].setPosition( 920, 430 );
+	gButtons[3].setPosition( 200, 600 );
+	gButtons[4].setPosition( 560, 600 );
+	gButtons[5].setPosition( 920, 600 );	
+}
+
 void papertable_render(){
 	paper_status_table_texture.render(0,0,&paper_table_rect);
 	if(paper[0])	paper_texture[0].render(35,15,&paper_1_rect);
 	if(paper[1])	paper_texture[1].render(105,15,&paper_2_rect);
 	if(paper[2])	paper_texture[2].render(175,15,&paper_3_rect);
-}
-
-void card_graph_render(){
-	int i, j;
-	for(i = 0 ; i < 2 ; i++)
-	{
-		for(j = 0 ; j < 3 ; j++)
-		{
-			card_texture[battle_deck[i][j].id].render(deck_rect[3 * i + j].x, deck_rect[3 * i + j].y, &deck_rect[3 * i + j]);
-		}
-	}
 }
 
 void battlescene_render(){
@@ -816,7 +901,14 @@ void battlescene_render(){
 	
 	professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
 
-	card_graph_render();
+	if(start_attacking == true || state != student_attacking){
+		for(int i = 0 ; i < 6 ; i++){
+			gButtons[i].Freese_LButtonSprite();
+		}	
+	}
+	for(int i = 0 ; i < 6 ; i++){
+		gButtons[i].render(card_texture, battle_deck, i);
+	}
 
 	
 	papertable_render();
@@ -1167,11 +1259,6 @@ void prof_attack_animation(){
 		iter -= (PI)/60;
 		SDL_Delay(10);
 	}
-	int num = 0;
-	num = rand()%2;
-	if(num == 0){	Mix_PlayChannel(-1,Hitmusic1,0);}
-	else if(num == 1){	Mix_PlayChannel(-1,Hitmusic2,0);}
-	
 }
 
 void noschool_script(){
@@ -1287,14 +1374,20 @@ void professor_name_render(){
 	professor_name[stage].render( Rect.x, Rect.y, &Rect);
 }
 
-void stud_attack_animation(){
+void stud_attack_animation( cards* card ){
 	double deg = 0;
 	int num = 0;
 	num = rand()%4;
-	if(num == 0){	Mix_PlayChannel(-1,Attackmusic1,0);}
-	else if(num == 1){	Mix_PlayChannel(-1,Attackmusic2,0);}
-	else if(num == 2){	Mix_PlayChannel(-1,Attackmusic3,0);}
-	else if(num == 3){	Mix_PlayChannel(-1,Attackmusic4,0);}
+	if ( card->id == 13){
+		Mix_PlayChannel(-1,Gururinpo,0);
+	}
+	else{
+		if(num == 0){	Mix_PlayChannel(-1,Attackmusic1,0);}
+		else if(num == 1){	Mix_PlayChannel(-1,Attackmusic2,0);}
+		else if(num == 2){	Mix_PlayChannel(-1,Attackmusic3,0);}
+		else if(num == 3){	Mix_PlayChannel(-1,Attackmusic4,0);}
+	}
+	
 	
 	SDL_Point center = {block_x * 5+19, 45 + block_y * 4+20};
 	SDL_Rect ballR = { center.x - 30 , center.y - 30 , 60 , 60 };
@@ -1373,11 +1466,18 @@ void miss_render(int x,int y){
 }
 
 void professor_function(){
-	if(student.stunning){ student.stunning = false; }
 	if(!professor[stage].stunning ){
 		prof_attack_animation();
 		int hitted = probability( professor[ stage ].hit_rate, student.avoid_rate );
-		if(hitted){
+		if(hitted != 0){
+			int num = 0;
+			num = rand()%4;
+			if(num == 0){	Mix_PlayChannel(-1,Hitmusic1,0);}
+			else if(num == 1){	Mix_PlayChannel(-1,Hitmusic2,0);}
+			else if(num == 2){	Mix_PlayChannel(-1,Hitmusic3,0);}
+			else if(num == 3){	Mix_PlayChannel(-1,Hitmusic4,0);}
+			else if(num == 4){	Mix_PlayChannel(-1,Hitmusic5,0);}
+			
 			student.hurt( professor[ stage ].attack );
 			professor[stage].do_effect( student );
 			SDL_Delay(300);
@@ -1385,6 +1485,7 @@ void professor_function(){
 		}
 		else{
 			bool left = rand()%2;
+			
 			for(int i=0;i<30;i++){
 				background_texture_render();
 				if(left)	miss_render(680-2*i,student_stun_rect.y-3-30*i+2*i*i);
@@ -1393,18 +1494,20 @@ void professor_function(){
 				SDL_RenderPresent( gRenderer );
 				SDL_Delay(30);
 				damage_render(1440,720,true);
+				SDL_RenderPresent(gRenderer);
 			}
-			SDL_RenderPresent(gRenderer);
 		}
 		
 	}
 	else{
 		SDL_Delay(300);
 		student_healthbar.update(student);
+		professor[stage].stunning = false;
 	}
 	
 	SDL_Delay(300);
-	if( student.burning == true){ student.hurt(3); }{
+	if( student.burning == true){ 
+		student.hurt(3);
 		student_healthbar.update(student);
 		SDL_Delay(300);
 	}
@@ -1415,6 +1518,9 @@ void professor_function(){
 	}
 	else{
 		state = student_attacking;
+		for(int i = 0 ; i < 6 ; i++){
+			gButtons[i].SetDefaultSprite();
+		}
 	}
 	return;
 }
@@ -1431,6 +1537,7 @@ void stun_animation(bool student){
 	SDL_Rect dizzyR = {posx,posy,stunning_texture.getWidth()*2,stunning_texture.getHeight()*2};
 	for(int i=0;i<144;i++){
 		battlescene_render();
+		dizzyR.x += 10;
 		stunning_texture.render(dizzyR.x, dizzyR.y, &dizzyR);
 		SDL_RenderPresent( gRenderer );
 		SDL_Delay(10);

@@ -2,8 +2,7 @@
 #define _CARDS_H
 
 #include "character.h"
-#include <ctime>
-#include <cstdlib>
+#include <bits/stdc++.h>
 #ifndef _ATTRIBUTE
 #define _ATTRIBUTE
 enum attribute{
@@ -27,7 +26,7 @@ class cards
 
         deck[1].nature = fire;
         deck[1].attack = 10;
-        deck[1].enemy_attack_rate = 0.85;
+        deck[1].enemy_attack_rate = 0.95;
 
         deck[2].nature = fire;
         deck[2].attack = 10;
@@ -54,7 +53,7 @@ class cards
 
         deck[9].nature = water;
         deck[9].attack = 10;
-        deck[9].enemy_attack_rate = 0.85;
+        deck[9].enemy_attack_rate = 0.95;
 
         deck[10].nature = water;
         deck[10].attack = 10;
@@ -76,7 +75,7 @@ class cards
 
         deck[15].nature = grass;
         deck[15].attack = 10;
-        deck[15].self_hit_rate = 0.30;
+        deck[15].self_hit_rate = 0.03;
 
         deck[16].nature = grass;
         deck[16].attack = 10;
@@ -88,29 +87,46 @@ class cards
         deck[17].self_heal = 60;
 
         deck[18].nature = grass;
-        deck[18].enemy_hit_rate = 0.85;
+        deck[18].enemy_hit_rate = 0.95;
 
         deck[19].nature = grass;
 
         deck[20].nature = grass;
-        deck[20].self_attack = 30;
+        deck[20].self_attack = 10;
 
         // ---------------------
 
     }
-    friend void card_effect(cards card, professor_class prof, student_class stud)
+    friend void card_effect(cards &card, professor_class &prof, student_class &stud)
     {
-        stud.health += card.self_heal;
+        stud.raise_health_limit(card.self_health_limit);
+		stud.health += card.self_heal;
+        if(stud.health > stud.get_health_limit()){
+        	stud.health = stud.get_health_limit();
+		}
         stud.shield += card.self_shield;
         stud.defence += card.self_defense;
         stud.attack_rate *= card.self_attack_rate;
-        stud.hit_rate *= card.self_hit_rate;
+        stud.hit_rate += card.self_hit_rate;
+        if(stud.hit_rate >= 1){
+        	stud.hit_rate = 1;
+		}
         stud.avoid_rate += card.self_avoid_rate;
+        if(stud.avoid_rate >= 1){
+        	stud.avoid_rate = 1;
+		}
+		stud.attack += card.self_attack;
 
         prof.attack *= card.enemy_attack_rate;
         prof.defence -= card.enemy_defense_loss;
+        if(prof.defence <= 0){
+        	prof.defence = 0;
+		}
         prof.hit_rate *= card.enemy_hit_rate;
         prof.avoid_rate -= card.enemy_avoid_rate;
+        if(prof.avoid_rate <= 0){
+        	prof.avoid_rate = 0;
+		}
 
         if(card.id == 2) // burning effect
         {
@@ -150,7 +166,7 @@ class cards
             stud.burning = false;
         }
 
-        card.id = -1;
+        //card.id = -1;
     }
     public:
         int id;
@@ -168,7 +184,7 @@ class cards
             self_avoid_rate = 0.00;
             enemy_attack_rate = 1.00;
             enemy_defense_loss = 0;
-            enemy_hit_rate = 0.00;
+            enemy_hit_rate = 1.00;
             enemy_avoid_rate = 0.00;
         }
         attribute get_attribute() {return nature;}
@@ -187,7 +203,7 @@ class cards
         double self_avoid_rate = 0.00;
         double enemy_attack_rate = 1.00;
         int enemy_defense_loss = 0;
-        double enemy_hit_rate = 0.00;
+        double enemy_hit_rate = 1.00;
         double enemy_avoid_rate = 0.00;
 };
 
