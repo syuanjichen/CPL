@@ -30,3 +30,4 @@
 ###### Nerfed: `最後的波紋` .
 ###### Name changed: `求雨` -> `永恆暴風雪` , `破甲箭` -> `破申箭` .
 ###### Bug fixed of professor healthbars do not initialize. 
+###### Bug fixed of multi-clicking after using `草` can stuck of game.
