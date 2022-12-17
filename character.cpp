@@ -20,7 +20,7 @@ student_class::student_class(){
 void student_class::init(){
 	health_limit = 100;
 	living = true;
-	
+	attack = 0;
 	health = 100;
 	shield = 0;
 	defence = 0;
@@ -38,7 +38,7 @@ void character_class::raise_health_limit(double a){
 }
 void student_class::hurt(double a){
 	
-	a = a * ( 100 / (100 + defence) );
+	a = a * ( 100.0 / (100.0 + (double)defence) );
 	int damage = (int)a;
 		
 	if(damage >= ( health + shield ) ){
@@ -58,7 +58,7 @@ void student_class::hurt(double a){
 }
 
 void student_class::direct_hurt(double a){
-	a = a * ( 100 / (100 + defence) );
+	a = a * ( 100.0 / (100.0 + defence) );
 	int damage = (int)a;
 		
 	if(damage >= health ){
@@ -77,7 +77,7 @@ int professor_class::hurt(cards card){
 			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
 		}
 		else if(card.get_attribute() == water){
-			damage = 1.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+			damage = 2.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
 		}
 		else{
 			damage = 0.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
@@ -91,12 +91,12 @@ int professor_class::hurt(cards card){
 			damage = 1.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
 		}
 		else{
-			damage = 1.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+			damage = 2.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
 		}
 	}
 	else if(element == grass){
 		if(card.get_attribute() == fire ){
-			damage = 1.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
+			damage = 2.0 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
 		}
 		else if(card.get_attribute() == water){
 			damage = 0.5 *card.get_attack()*1.0*100.0 / (100.0+this->defence); 
@@ -192,8 +192,8 @@ professor_class::professor_class(int a){
 			stun_counter = 5;
 			break;
 		case 0:
-			health_limit = 700;
-			difficulty = 10;
+			health_limit = 2000;
+			difficulty = 100;
 			element = water;
 			living = true;
 			health = health_limit;
@@ -201,7 +201,7 @@ professor_class::professor_class(int a){
 			attack = 20;
 			defence = 350;
 			hit_rate = 1.00;
-			avoid_rate = 0.2;
+			avoid_rate = 0.40;
 			burning = false;
 			stunning = false;
 			special = health_to_attack;
@@ -214,6 +214,7 @@ professor_class::professor_class(int a){
 void professor_class::do_effect(student_class &student){
 	switch ( special ){
 		case health_to_attack:
+			this->attack = 20 + (this->get_health_limit() - this->health);
 		break;
 
 		case swifty:

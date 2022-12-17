@@ -11,9 +11,13 @@ enum attribute{
 	grass
 };
 #endif
+extern int stage;
+
 class cards
 {
-    friend void cards_initialize(cards deck[])
+    public:
+	
+	friend void cards_initialize(cards deck[])
     {
         for(int i = 0 ; i < 21 ; i++)
         {
@@ -143,7 +147,7 @@ class cards
             int temp_health;
             temp_health = stud.health;
             stud.health = 1;
-            card.attack = (temp_health - stud.health) * (stud.attack_rate);
+            card.attack = ((temp_health - stud.health) * (stud.attack_rate) * stage ) ;
         }
 
         if(card.id == 8)
@@ -168,7 +172,6 @@ class cards
 
         //card.id = -1;
     }
-    public:
         int id;
         cards()
         {
@@ -187,6 +190,22 @@ class cards
             enemy_hit_rate = 1.00;
             enemy_avoid_rate = 0.00;
         }
+        cards(cards& card){
+        	nature = card.nature;
+	        attack = card.attack;
+	        self_attack = card.self_attack;
+	        self_heal = card.self_heal;
+	        self_health_limit = card.self_health_limit;
+	        self_shield = card.self_shield;
+	        self_defense = card.self_defense;
+	        self_attack_rate = card.self_attack_rate;
+	        self_hit_rate = card.self_hit_rate;
+	        self_avoid_rate = card.self_avoid_rate;
+	        enemy_attack_rate = card.enemy_attack_rate;
+	        enemy_defense_loss = card.enemy_defense_loss;
+	        enemy_hit_rate = card.enemy_hit_rate;
+	        enemy_avoid_rate = card.enemy_avoid_rate;
+		}
         attribute get_attribute() {return nature;}
         int get_attack() { return attack;	}
         void set_attack(int value) { attack = value;}

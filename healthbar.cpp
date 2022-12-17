@@ -85,6 +85,7 @@ void healthbar_class::render(student_class student){
 	if(student.shield){ shield_texture.render( SR.x , SR.y , &SR ); }
 }
 void healthbar_class::update(student_class student){
+	max_value = student.get_health_limit();
 	current_value = student.health;
 	int end = ( current_value * 100 ) / max_value;
 	int start = ( previous_value * 100 ) / max_value;
@@ -106,10 +107,10 @@ void healthbar_class::update(student_class student){
 	}
 	else if(end > start){
 		while(start < end){
-			for(int i=0;i<start;i++){
+			for(int i=0;i<start+1;i++){
 				hp[i] = true;
 			}
-			for(int i=start;i<100;i++){
+			for(int i=start+1;i<100;i++){
 				hp[i] = false;
 			}
 			battlescene_render(); 
@@ -144,16 +145,16 @@ void healthbar_class::update(professor_class professor){
 		}
 	}
 	else if(end > start){
-		while(start != end){
-			for(int i=0;i<start;i++){
+		while(start <= end){
+			for(int i=0;i<=start;i++){
 				hp[i] = true;
 			}
-			for(int i=start;i<100;i++){
+			for(int i=start+1;i<100;i++){
 				hp[i] = false;
 			}
 			battlescene_render(); 
 			render();
-			SDL_RenderPresent( gRenderer );//update screen
+			SDL_RenderPresent( gRenderer );		//update screen
 			start++;
 			SDL_Delay(20);
 		}
