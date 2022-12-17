@@ -22,4 +22,5 @@
 ###### Separated `Hackmode` from `Cheatmode` .
 
 #### Game Version : ALPHA 1.4.1 Log :
-###### Buffed `玩泥巴` .
+###### Buffed `玩泥巴` , `高溫重壓` , `地獄疙瘩` , `咕嚕靈波` .
+###### Nerfed `滔滔衝浪`
