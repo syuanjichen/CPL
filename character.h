@@ -44,6 +44,7 @@ class student_class : public character_class{						// class of the main characte
 		student_class();
 		void init();
 		void hurt(double);					// input the damage and adjust the health of student by calculating defence factors
+		void direct_hurt(double);
 };
 
 class professor_class : public character_class{						//class of enemy
@@ -59,7 +60,7 @@ class professor_class : public character_class{						//class of enemy
 		
 		professor_class(int a = 0);
 		attribute get_attribute() { return element; }	//return attribute 
-		void do_effect( student_class student);
+		void do_effect( student_class& student);
 		int hurt(cards);
 		//void hurt(double);							//this is lee's job
 };

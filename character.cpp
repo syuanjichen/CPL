@@ -57,6 +57,19 @@ void student_class::hurt(double a){
 	}
 }
 
+void student_class::direct_hurt(double a){
+	a = a * ( 100 / (100 + defence) );
+	int damage = (int)a;
+		
+	if(damage >= health ){
+		health = 0;
+		living = false;
+	}
+	else {
+		health -= damage;
+	}
+}
+
 int professor_class::hurt(cards card){
 	double damage;
 	if(element == fire){
@@ -156,7 +169,7 @@ professor_class::professor_class(int a){
 			burning = false;
 			stunning = false;
 			special = firing;
-			ignite_counter = 6;
+			ignite_counter = 10;
 			stun_counter = 0;
 			break;
 			
@@ -176,7 +189,7 @@ professor_class::professor_class(int a){
 			stunning = false;
 			special = stun;
 			ignite_counter = 0;
-			stun_counter = 3;
+			stun_counter = 5;
 			break;
 		case 0:
 			health_limit = 700;
@@ -198,7 +211,7 @@ professor_class::professor_class(int a){
 	}
 	
 }
-void professor_class::do_effect(student_class student){
+void professor_class::do_effect(student_class &student){
 	switch ( special ){
 		case health_to_attack:
 		break;
@@ -218,8 +231,6 @@ void professor_class::do_effect(student_class student){
 		else{
 			this->stun_counter +=1;
 		}
-		
-		
 		break;
 		
 		case firing:

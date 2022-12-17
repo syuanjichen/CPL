@@ -60,7 +60,7 @@ enum game_state {				//game states
 	get_aplus					//student defeated boss and got all paper
 };
 game_state state = start;	  //define state as the variable indicates current game state
-int stage = 5;				  //stage indicate which stage now is in
+int stage = 1;				  //stage indicate which stage now is in
 bool paper[3] = {};
 int paper_num = 0;
 int yes;
@@ -94,6 +94,7 @@ TTF_Font *namefont = NULL;
 TTF_Font *damagefont = NULL;
 
 TTF_Font *titlefont = NULL ;
+
 TTF_Font *titleinsidefont = NULL ;
 
 cards all_card[21], **battle_deck;
@@ -127,8 +128,8 @@ void you_suck(bool init = false);
 void stage_clear(bool init = false);
 void ending_check();
 
-SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 40 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
-SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 40 + block_y*4 		, 40		 , 40		 };//student stunning icon position
+SDL_Rect student_burn_rect 		= { block_x*5 + 625	, 30 + block_y*4	 	, 40		 , 40		 }; //student burning icon position
+SDL_Rect student_stun_rect 		= { block_x*5 + 665	, 30 + block_y*4 		, 40		 , 40		 };//student stunning icon position
 SDL_Rect professor_burn_rect 	= { block_x*8 + 332 , block_y*0	 			, 40		 , 40		 }; //professor burning icon position
 SDL_Rect professor_stun_rect 	= { block_x*8 + 372 , block_y*0				, 40		 , 40	 	 }; //professor stunning icon position
 SDL_Rect professor_pos_rect 	= { block_x*3  		, block_y*0 + 40		, block_x*10 , block_y*4 };//professor on stage position
@@ -139,6 +140,12 @@ SDL_Rect paper_3_rect			= {	175				, 15					, 60		 , 60		 };
 SDL_Rect deck_rect[6] = {{280, 450, 280, 140}, {580, 450, 280, 140}, {880, 450, 280, 140}, {280, 600, 280, 140}, {580, 600, 280, 140}, {880, 600, 280, 140}};
 SDL_Rect shieldRect = {block_x * 5-50, 45 + block_y * 4-15,60,60};
 SDL_Rect diabgRect;
+SDL_Rect deckR = {200,430,1120,380};
+SDL_Rect ballR = {700,160,40,40};//y=160~y=400
+SDL_Rect ballR1 = {700,160,40,40};
+SDL_Rect ballR2 = {700,160,40,40};
+SDL_Rect ballR3 = {700,160,40,40};
+SDL_Rect ballR4 = {700,160,40,40};
 
 SDL_Color continue_button_color = {0xFF,0xFF,0xFF};
 SDL_Color get_f_text_color = {0xFF,0xFF,0xFF};
@@ -184,11 +191,12 @@ LTexture dialogue[11];
 LTexture opening_introduction;
 LTexture dialogue_background;
 LTexture stage_text;
+LTexture deck_bg; 
 
 student_class student;
 professor_class professor[6];
 
-healthbar_class student_healthbar( block_x * 5, 45 + block_y * 4, student );
+healthbar_class student_healthbar( block_x * 5, 35 + block_y * 4, student );
 healthbar_class professor_healthbar[6] ;
 
 Uint16 chinese_test[] = {0x65e9,0x5b89,0x4f60,0x597d};	
@@ -354,6 +362,8 @@ bool loadMedia()
 		printf( "Failed to load stage 4 bg texture!\n" );		success = false;	}
 	if( !stage_background_texture[5].loadFromFile( "img/stage_background_5.bmp" ) ){
 		printf( "Failed to load stage 5 bg texture!\n" );		success = false;	}
+	if( !deck_bg.loadFromFile( "img/deck_bg.bmp" ) ){
+		printf( "Failed to load deck_bg texture!\n" );		success = false;	}
 	if( !card_texture[0].loadFromFile("img/card_00.bmp")){
 		printf("Failed to load card_00 texture!\n");	success = false;}
 	else{card_sprite_preset();}
@@ -735,10 +745,6 @@ int main( int argc, char* args[] )
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						
 						if ( state == enter_stage ){
-							
-							student.burning = false;			student.stunning = false;
-							professor[stage].burning = false;	professor[stage].stunning = false;
-							student.health = student.get_health_limit();
 							student_healthbar.init(student);
 							//tell player what ability that enemy posesses
 							if(e.type == SDL_KEYDOWN){
@@ -785,7 +791,7 @@ int main( int argc, char* args[] )
 							if( start_attacking ){
 								if(!student.stunning){
 									int professor_hurt_damage = -1;			//the damage professor take
-									selected_card.set_attack(10000);
+									//selected_card.set_attack(10000);
 									card_effect(selected_card, professor[stage], student);
 									student_healthbar.update(student);
 									
@@ -839,16 +845,19 @@ int main( int argc, char* args[] )
 					else if(state == gatcha){
 						
 						if(e.type == SDL_KEYDOWN){
+							student.burning = false;			student.stunning = false;
+							professor[stage].burning = false;	professor[stage].stunning = false;
+							student.health = student.get_health_limit();
 							stage_clear(true);//reset animation
 							switch( e.key.keysym.sym ){
                    	 	    case SDLK_SPACE:
-                   	 	    	ending_check();
                    	     	    if(stage < 5){
                                     
 		                   	     	stage += 1;
 									state = enter_stage;
 								}
 								else{
+									ending_check();
 									if( paper[0] && paper[1] && paper[2] ){
 										state = get_aplus;
 									}
@@ -925,12 +934,12 @@ void card_sprite_preset(){
 		gSpriteClips[ i ].h = BUTTON_HEIGHT;
 	}
 	//Set buttons in corners
-	gButtons[0].setPosition( 200, 440 );
-	gButtons[1].setPosition( 560, 440 );
-	gButtons[2].setPosition( 920, 440 );
-	gButtons[3].setPosition( 200, 630 );
-	gButtons[4].setPosition( 560, 630 );
-	gButtons[5].setPosition( 920, 630 );	
+	gButtons[0].setPosition( 225, 458 );
+	gButtons[1].setPosition( 585, 458 );
+	gButtons[2].setPosition( 945, 458 );
+	gButtons[3].setPosition( 225, 622 );
+	gButtons[4].setPosition( 585, 622 );
+	gButtons[5].setPosition( 945, 622 );	
 }
 
 void papertable_render(){
@@ -954,6 +963,7 @@ void battlescene_render(){
 			gButtons[i].Freese_LButtonSprite();
 		}	
 	}
+	deck_bg.render(deckR.x,deckR.y,&deckR);
 	for(int i = 0 ; i < 6 ; i++){
 		gButtons[i].render(card_texture, battle_deck, i);
 	}
@@ -1317,16 +1327,27 @@ void get_aplus_script(){
 void prof_attack_animation(){
 	
 	double iter = PI/2;
-	SDL_Rect ballR = {700,160,40,40};//y=160~y=400
-	for(int i=0;i<60;i++){
+	for(int i=0;i<120;i++){
 		background_texture_render();
-		ballR.x = 700 + 60*cos(iter) - i * 5;
-		ballR.y = 280 - 120*sin(iter);
+		ballR.x = 700 + 60*cos(iter) - i/2 * 5;
+		ballR.y = 275 - 120*sin(iter);
+		ballR1.x = ballR.x + 40*cos(iter*10)*cos(iter);
+		ballR1.y = ballR.y + 40*sin(iter*10)*cos(iter);
+		ballR2.x = ballR.x + 40*cos(iter*10+(PI))*cos(iter);
+		ballR2.y = ballR.y + 40*sin(iter*10+(PI))*cos(iter);
+		ballR3.x = ballR.x + 80*sin(iter*10)*cos(iter);
+		ballR3.y = ballR.y + 80*cos(iter*10)*cos(iter);
+		ballR4.x = ballR.x + 80*sin(iter*10+(PI))*cos(iter);
+		ballR4.y = ballR.y + 80*cos(iter*10+(PI))*cos(iter);
 		student_healthbar.render(student);
-		magicball.render(ballR.x,ballR.y,&ballR,10*i);
+		magicball.render(ballR.x,ballR.y,&ballR,-5*i);
+		if(professor[stage].attack >= 10)		magicball.render(ballR1.x,ballR1.y,&ballR1,-8*i);
+		if(professor[stage].attack >= 15)		magicball.render(ballR2.x,ballR2.y,&ballR2,8*i);
+		if(professor[stage].attack >= 50)		magicball.render(ballR3.x,ballR3.y,&ballR3,-8*i);
+		if(professor[stage].attack >= 50)		magicball.render(ballR4.x,ballR4.y,&ballR4,8*i);
 		SDL_RenderPresent( gRenderer );
-		iter -= (PI)/60;
-		SDL_Delay(10);
+		iter -= (PI)/120;
+		SDL_Delay(20);
 	}
 }
 
@@ -1516,7 +1537,7 @@ void stud_health_render(){
     student_health_text << "HP: " << student.health;
 	if( !student_health_text_texture.loadFromRenderedText( student_health_text.str().c_str(), continue_button_color ) )
     {  printf( "Unable to render student_health_text_texture!\n" );}
-	SDL_Rect HPbg = {block_x * 5-200, 40 + block_y * 4,160,40};
+	SDL_Rect HPbg = {block_x * 5-200, 30 + block_y * 4,160,40};
 	student_health_bg.render(HPbg.x,HPbg.y,&HPbg);
 	SDL_Rect healthtextrect = {HPbg.x+32,HPbg.y+4,student_health_text_texture.getWidth(),student_health_text_texture.getHeight()};
 	student_health_text_texture.render(healthtextrect.x,healthtextrect.y,&healthtextrect);
@@ -1579,6 +1600,7 @@ void professor_function(){
 		
 	}
 	else{
+		stun_animation(false);
 		SDL_Delay(300);
 		student_healthbar.update(student);
 		professor[stage].stunning = false;
@@ -1586,7 +1608,7 @@ void professor_function(){
 	
 	SDL_Delay(300);
 	if( student.burning == true){ 
-		student.hurt(3);
+		student.direct_hurt(3);
 		student_healthbar.update(student);
 		SDL_Delay(300);
 	}
@@ -1680,7 +1702,7 @@ void stage_clear(bool init){
 }
 
 void ending_check(){
-	SDL_Rect BGR = {720 - 2*paper_status_table_texture.getWidth() ,405 - 2*paper_status_table_texture.getHeight() ,4*paper_status_table_texture.getWidth() ,4*paper_status_table_texture.getHeight() };
+	SDL_Rect BGR = {720 - 2*paper_status_table_texture.getWidth() ,413 - 2*paper_status_table_texture.getHeight() ,4*paper_status_table_texture.getWidth() ,4*paper_status_table_texture.getHeight() };
 	SDL_Rect P1 = {320, 295, 240, 240};
 	SDL_Rect P2 = {600, 295, 240, 240};
 	SDL_Rect P3 = {880, 295, 240, 240};
