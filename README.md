@@ -18,5 +18,5 @@
 ###### Added `Cheatmode` mode.
 ###### Fixed bug of attack value of student does not reset after died.
 
-### Game Version : ALPHA 1.3 Log :
+### Game Version : ALPHA 1.4 Log :
 ###### Separated `Hackmode` from `Cheatmode` .
