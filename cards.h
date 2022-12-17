@@ -171,15 +171,15 @@ class cards
 
         if(card.id == 10)
         {
-            prof.stunning = true;
+            int prob = rand()% 5;
+            if(prob > 1){
+            	prof.stunning = true;
+			}
         }
 
         if(card.id == 14)
         {
-            int prob = rand()% 5;
-            if(prob > 1){
-            	stud.stunning = true;
-			}
+            stud.stunning = true;
         }
 
         if(card.id == 19)
