@@ -71,7 +71,7 @@ enum cheatmode{
 };
 cheatmode cheating = o;
 game_state state = start;	  //define state as the variable indicates current game state
-int stage = 5;				  //stage indicate which stage now is in
+int stage = 1;				  //stage indicate which stage now is in
 bool paper[3] = {};
 int paper_num = 0;
 int yes;
