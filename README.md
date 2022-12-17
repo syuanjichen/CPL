@@ -23,4 +23,10 @@
 
 #### Game Version : ALPHA 1.4.1 Log :
 ###### Buffed `玩泥巴` , `高溫重壓` , `地獄疙瘩` , `咕嚕靈波` .
-###### Nerfed `滔滔衝浪`
+###### Nerfed `滔滔衝浪` .
+
+#### Game Version : ALPHA 1.5 Log :
+###### Buffed: `烈焰龍捲風` .
+###### Nerfed: `最後的波紋` .
+###### Name changed: `求雨` -> `永恆暴風雪` , `破甲箭` -> `破申箭` .
+###### Bug fixed of professor healthbars do not initialize. 
