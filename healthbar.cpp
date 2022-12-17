@@ -42,10 +42,10 @@ void healthbar_class::init(student_class student){
 	for(int i=0;i<100;++i){ hp[i] = true; }
 	
 }
-void healthbar_class::init( const professor_class professor){
+void healthbar_class::init( professor_class professor){
 //	x = x0;
 //	y = y0;
-	max_value = professor.health;
+	max_value = professor.get_health_limit();
 	previous_value = max_value;
 	current_value = max_value;
 	for(int i=0;i<100;++i){ hp[i] = true; }

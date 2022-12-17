@@ -29,7 +29,7 @@ class healthbar_class{
 		bool hp[100];
 		
 		void init(student_class);
-		void init(const professor_class);
+		void init(professor_class);
 		void update(student_class);
 		void update(professor_class);
 		void render();

@@ -653,7 +653,7 @@ void close()
 }
 
 cards** deck_initialize(cards all[]){
-    int i, j, random_id;
+	int i, j, random_id;
     cards **deck;
     deck = new cards* [2];
 
@@ -662,24 +662,59 @@ cards** deck_initialize(cards all[]){
     }
 
     srand(time(0));
-
+	int num_of_ceasar = 0;
+	
     for(i = 0 ; i < 2 ; i++){
         for(j = 0 ; j < 3 ; j++){
             random_id = rand() % 21;
+            if(random_id == 6){
+            	num_of_ceasar += 1;
+			}
+			while(num_of_ceasar > 1){
+				random_id = rand() % 21;
+				if(random_id != 6){
+					num_of_ceasar -= 1;
+					break;
+				}
+			}
             deck[i][j] = all[random_id];
         }
     }
-
+    
+    
     return deck;
 }
 
 void card_draw(cards *deck[], cards all[]){
-    int i, j;
+    int i, j, num_of_ceasar = 0;
     for(i = 0 ; i < 2 ; i++){
         for(j = 0 ; j < 3 ; j++){
-            if(deck[i][j].id == -1){
-                deck[i][j] = (all[rand() % 21]);
-            }
+            for(int ii = 0 ; ii < 2 ; ii++){
+		        for(int jj = 0 ; jj < 3 ; jj++){
+		            if(deck[ii][jj].id == 6){
+		                num_of_ceasar += 1;
+		            }
+		        }
+		    }
+			if(num_of_ceasar == 0){
+            	if(deck[i][j].id == -1){
+            		int randnum = rand() % 21;
+            		if (randnum == 6){
+            			randnum = rand() % 21;
+					}
+                	deck[i][j] = (all[randnum]);
+            	}
+			}
+			else{
+				int randnum;
+				do{
+					randnum = rand() % 21;
+				}while(randnum == 6);
+				if(deck[i][j].id == -1){
+                	deck[i][j] = (all[rand() % 21]);
+            	}
+			}
+			
         }
     }
 }

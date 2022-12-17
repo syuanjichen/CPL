@@ -12,6 +12,9 @@ enum attribute{
 };
 #endif
 extern int stage;
+extern cards **battle_deck;
+extern cards all_card[21];
+extern void card_draw(cards *deck[], cards all[]);
 
 class cards
 {
@@ -30,14 +33,14 @@ class cards
 
         deck[1].nature = fire;
         deck[1].attack = 10;
-        deck[1].enemy_attack_rate = 0.95;
+        deck[1].enemy_attack_rate = 0.85;
 
         deck[2].nature = fire;
         deck[2].attack = 10;
 
         deck[3].nature = fire;
         deck[3].attack = 5;
-        deck[3].self_attack_rate = 1.20;
+        deck[3].self_attack_rate = 1.30;
 
         deck[4].nature = fire;
 
@@ -51,9 +54,11 @@ class cards
         // Water Cards
         deck[7].nature = water;
         deck[7].attack = 20;
+        deck[7].self_hit_rate = -0.05;
 
         deck[8].nature = water;
         deck[8].attack = 15;
+        deck[8].enemy_attack_rate = 0.95;
 
         deck[9].nature = water;
         deck[9].attack = 10;
@@ -66,10 +71,10 @@ class cards
         deck[11].self_defense = 50;
 
         deck[12].nature = water;
-        deck[12].self_shield = 30;
+        deck[12].self_shield = 40;
         
         deck[13].nature = water;
-        deck[13].enemy_avoid_rate = 0.05;
+        deck[13].enemy_avoid_rate = 0.03;
 
         // --------------------
 
@@ -79,7 +84,7 @@ class cards
 
         deck[15].nature = grass;
         deck[15].attack = 10;
-        deck[15].self_hit_rate = 0.03;
+        deck[15].self_hit_rate = 0.05;
 
         deck[16].nature = grass;
         deck[16].attack = 10;
@@ -88,15 +93,15 @@ class cards
 
         deck[17].nature = grass;
         deck[17].attack = 5;
-        deck[17].self_heal = 60;
+        deck[17].self_heal = 70;
 
         deck[18].nature = grass;
-        deck[18].enemy_hit_rate = 0.95;
+        deck[18].enemy_hit_rate = 0.90;
 
         deck[19].nature = grass;
 
         deck[20].nature = grass;
-        deck[20].self_attack = 10;
+        deck[20].self_attack = 20;
 
         // ---------------------
 
@@ -105,21 +110,25 @@ class cards
     {
         stud.raise_health_limit(card.self_health_limit);
 		stud.health += card.self_heal;
-        if(stud.health > stud.get_health_limit()){
-        	stud.health = stud.get_health_limit();
-		}
         stud.shield += card.self_shield;
         stud.defence += card.self_defense;
         stud.attack_rate *= card.self_attack_rate;
         stud.hit_rate += card.self_hit_rate;
+        stud.avoid_rate += card.self_avoid_rate;
+        stud.attack += card.self_attack;
+        if(stud.health > stud.get_health_limit()){
+        	stud.health = stud.get_health_limit();
+		}
         if(stud.hit_rate >= 1){
         	stud.hit_rate = 1;
 		}
-        stud.avoid_rate += card.self_avoid_rate;
+		else if(stud.hit_rate <= 0){
+			stud.hit_rate = 0;
+		}
         if(stud.avoid_rate >= 1){
         	stud.avoid_rate = 1;
 		}
-		stud.attack += card.self_attack;
+		
 
         prof.attack *= card.enemy_attack_rate;
         prof.defence -= card.enemy_defense_loss;
@@ -131,7 +140,12 @@ class cards
         if(prof.avoid_rate <= 0){
         	prof.avoid_rate = 0;
 		}
-
+		if(card.id == 0){
+			for(int i=0;i<6;i++){
+				battle_deck[i/3][i%3].id = -1;
+				card_draw(battle_deck,all_card);
+			}
+		}
         if(card.id == 2) // burning effect
         {
             prof.burning = true;
@@ -162,7 +176,10 @@ class cards
 
         if(card.id == 14)
         {
-            stud.stunning = true;
+            int prob = rand()% 5;
+            if(prob > 1){
+            	stud.stunning = true;
+			}
         }
 
         if(card.id == 19)
