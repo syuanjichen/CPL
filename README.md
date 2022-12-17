@@ -1,5 +1,7 @@
 # 溫馨建議：音量先關到0
 
+## 小建議 : 不要用中文輸入法進行遊戲
+
 #### Game Version : ALPHA 1.5.1 Log :
 ###### Now the frame of professors implies their attribute.
 
