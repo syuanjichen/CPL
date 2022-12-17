@@ -20,3 +20,6 @@
 
 ### Game Version : ALPHA 1.4 Log :
 ###### Separated `Hackmode` from `Cheatmode` .
+
+#### Game Version : ALPHA 1.4.1 Log :
+###### Buffed `玩泥巴` .
