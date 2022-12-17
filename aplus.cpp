@@ -69,7 +69,15 @@ enum cheatmode{
 	chea,
 	cheat
 };
+enum hackmode{
+	oo,
+	h,
+	ha,
+	hac,
+	hack
+};
 cheatmode cheating = o;
+hackmode hacking = oo;
 game_state state = start;	  //define state as the variable indicates current game state
 int stage = 1;				  //stage indicate which stage now is in
 bool paper[3] = {};
@@ -773,25 +781,75 @@ int main( int argc, char* args[] ){
 										if(cheating == o){
 											cheating = c;
 										}
+										else{
+											cheating = o;
+										}
+										if(hacking == ha){
+											hacking = hac;
+										}
+										else{
+											hacking = oo;
+										}
 										break;
 									case SDLK_h:
 										if(cheating == c){
 											cheating = ch;
+										}
+										else{
+											cheating = o;
+										}
+										if(hacking == oo){
+											hacking = h;
+										}
+										else{
+											hacking = oo;
 										}
 										break;
 									case SDLK_e:
 										if(cheating == ch){
 											cheating = che;
 										}
+										else{
+											cheating = o;
+										}
+										if(hacking != hack){
+											hacking = oo;
+										}
 										break;
 									case SDLK_a:
 										if(cheating == che){
 											cheating = chea;
 										}
+										else{
+											cheating = o;
+										}
+										if(hacking == h){
+											hacking = ha;
+										}
+										else{
+											hacking = oo;
+										}
 										break;
 									case SDLK_t:
 										if(cheating == chea){
 											cheating = cheat;
+										}
+										else{
+											cheating = o;
+										}
+										if(hacking != hack){
+											hacking = oo;
+										}
+										break;
+									case SDLK_k:
+										if(hacking == hac){
+											hacking = hack;
+										}
+										else{
+											hacking = oo;
+										}
+										if(cheating != cheat){
+											cheating = o;
 										}
 										break;
 									case SDLK_r:
@@ -804,10 +862,16 @@ int main( int argc, char* args[] ){
 										else{
 											cheating = o;
 										}
+										if(hacking != hack){
+											hacking = oo;
+										}
 										break;
 									default:
 										if(cheating != cheat){
 											cheating = o;
+										}
+										if(hacking != hack){
+											hacking = oo;
 										}
 									break;
 								}
@@ -815,7 +879,7 @@ int main( int argc, char* args[] ){
 							if( start_attacking ){
 								if(!student.stunning){
 									int professor_hurt_damage = -1;			//the damage professor take
-									if(cheating == cheat)	selected_card.set_attack(10000);
+									if(hacking == hack)	selected_card.set_attack(10000);
 									card_effect(selected_card, professor[stage], student);
 									student_healthbar.update(student);
 									
