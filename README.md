@@ -15,5 +15,8 @@
 ###### Fixed bug of healthbar that good health potion cannot set student healthbar to full
 ###### Fixed bug of professor5 does not do effect.
 ###### Fixed bug of white screen.
-###### Added cheat mode.
+###### Added `Cheatmode` mode.
 ###### Fixed bug of attack value of student does not reset after died.
+
+### Game Version : ALPHA 1.3 Log :
+###### Separated `Hackmode` from `Cheatmode` .
