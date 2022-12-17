@@ -3,7 +3,7 @@
 This game is still under development.
 
 ### Game Version : ALPHA 1.1 Log :
-Added animation of stage clear, died.
+Added animation of stage clear, died. \n
 Dialogue animation now must to press space to move on to the next dialogue.
 
 ### Game Version : ALPHA 1.2 Log :
