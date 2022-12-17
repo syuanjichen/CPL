@@ -3,7 +3,8 @@
 ## 小建議 : 不要用中文輸入法進行遊戲
 
 #### Game Version : ALPHA 1.5.1 Log :
-###### Now the frame of professors implies their attribute.
+###### Now the frame of professors implies their attribute
+###### Fixed bug of the probability of `滔滔衝浪` does not funciton properly.
 
 ### Game Version : ALPHA 1.5 Log :
 ###### Buffed: `烈焰龍捲風` .
