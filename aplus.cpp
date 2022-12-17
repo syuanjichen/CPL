@@ -1174,6 +1174,7 @@ void background_texture_render(){
 				else{
 					bool left = rand()%2;
 					for(int i=0;i<30;i++){
+						while(SDL_PollEvent(&e) != 0){}
 						background_texture_render();
 						if(left)	{miss_render(680-2*i,student_stun_rect.y-3-30*i+2*i*i);}
 						else		{miss_render(680+2*i,student_stun_rect.y-3-30*i+2*i*i);}	
@@ -1182,7 +1183,7 @@ void background_texture_render(){
 						damage_render(1440,720,true);
 						SDL_RenderPresent(gRenderer);
 					}
-				}	
+				}
 			}
 			else{
 				stun_animation(false);
@@ -1207,6 +1208,7 @@ void background_texture_render(){
 					gButtons[i].SetDefaultSprite();
 				}
 			}
+			while(SDL_PollEvent(&e) != 0){}
 		}
 		if(state == enter_stage){
             if(stage == 1){
@@ -1497,11 +1499,10 @@ void get_aplus_script(){
 }
 
 void prof_attack_animation(){
-	PollEventResult = SDL_PollEvent(&e);
 	double iter = PI/2;
 	if(professor[stage].attack >= 10 && professor[stage].attack < 15){
 		for(int i=0;i<120;i++){
-			PollEventResult = SDL_PollEvent(&e);
+			while(SDL_PollEvent(&e) != 0){}
 			background_texture_render();
 			ballR.x = 700 + 60*cos(iter) - i/2 * 5;
 			ballR.y = 275 - 120*sin(iter);
@@ -1523,6 +1524,7 @@ void prof_attack_animation(){
 	}
 	else if(professor[stage].attack >= 15 && professor[stage].attack < 50){
 		for(int i=0;i<120;i++){
+			while(SDL_PollEvent(&e) != 0){}
 			background_texture_render();
 			ballR.x = 700 + 60*cos(iter) - i/2 * 5;
 			ballR.y = 275 - 120*sin(iter);
@@ -1545,6 +1547,7 @@ void prof_attack_animation(){
 	}
 	else if(professor[stage].attack >= 50){
 		for(int i=0;i<120;i++){
+			while(SDL_PollEvent(&e) != 0){}
 			background_texture_render();
 			ballR.x = 700 + 60*cos(iter) - i/2 * 5;
 			ballR.y = 275 - 120*sin(iter);
@@ -1569,6 +1572,7 @@ void prof_attack_animation(){
 	}
 	else{
 		for(int i=0;i<120;i++){
+			while(SDL_PollEvent(&e) != 0){}
 			background_texture_render();
 			ballR.x = 700 + 60*cos(iter) - i/2 * 5;
 			ballR.y = 275 - 120*sin(iter);
@@ -1587,6 +1591,7 @@ void prof_attack_animation(){
 			SDL_Delay(20);
 		}
 	}
+	while(SDL_PollEvent(&e) != 0){}
 }
 
 void noschool_script(int noschool_text){
@@ -1815,9 +1820,10 @@ void stun_animation(bool student){
 	else{
 		posy = professor_stun_rect.y;
 	}
-	
+	while(SDL_PollEvent(&e) != 0){}
 	SDL_Rect dizzyR = {posx,posy,stunning_texture.getWidth()*2,stunning_texture.getHeight()*2};
 	for(int i=0;i<144;i++){
+		while(SDL_PollEvent(&e) != 0){}
 		battlescene_render();
 		dizzyR.x += 10;
 		stunning_texture.render(dizzyR.x, dizzyR.y, &dizzyR);
