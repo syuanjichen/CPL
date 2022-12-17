@@ -57,7 +57,7 @@ class cards
 
         deck[9].nature = water;
         deck[9].attack = 10;
-        deck[9].enemy_attack_rate = 0.95;
+        deck[9].enemy_attack_rate = 0.85;
 
         deck[10].nature = water;
         deck[10].attack = 10;
