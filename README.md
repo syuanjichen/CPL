@@ -2,6 +2,9 @@
 
 ## 小建議 : 不要用中文輸入法進行遊戲
 
+### Game Version : ALPHA 1.6 Log :
+###### Added hint button in game to show hint about card effects.
+
 #### Game Version : ALPHA 1.5.1 Log :
 ###### Now the frame of professors implies their attribute
 ###### Fixed bug of the probability of `滔滔衝浪` does not funciton properly.
