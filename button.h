@@ -32,9 +32,13 @@ class LButton
 
 		//Handles mouse event
 		void handleEvent( SDL_Event* e );
+		
+		void handleEvent_hint( SDL_Event* );
 
 		//Shows button sprite
 		void render(LTexture card_texture[], cards **battle_deck, int i);
+		
+		void render_hint(LTexture& texture);
 
 		int GetPosition_x()
 		{
@@ -66,6 +70,7 @@ extern SDL_Renderer* gRenderer;
 //Mouse button sprites
 SDL_Rect gSpriteClips[ BUTTON_SPRITE_TOTAL ];
 LTexture gButtonSpriteSheetTexture;
+SDL_Rect ButtonSpriteClips[ BUTTON_SPRITE_TOTAL ];
 
 //Buttons objects
 
@@ -143,12 +148,77 @@ void LButton::handleEvent( SDL_Event* e )
 	}
 }
 
+void LButton::handleEvent_hint( SDL_Event* e )
+{
+	//If mouse event happened
+	if( e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP )
+	{
+		//Get mouse position
+		int x, y;
+		SDL_GetMouseState( &x, &y );
+
+		//Check if mouse is in button
+		bool inside = true;
+
+		//Mouse is left of the button
+		if( x < mPosition.x )
+		{
+			inside = false;
+		}
+		//Mouse is right of the button
+		else if( x > mPosition.x + 40 )
+		{
+			inside = false;
+		}
+		//Mouse above the button
+		else if( y < mPosition.y )
+		{
+			inside = false;
+		}
+		//Mouse below the button
+		else if( y > mPosition.y + 40 )
+		{
+			inside = false;
+		}
+		mouse_on = inside;
+		//Mouse is outside button
+		if( !inside )
+		{
+			mCurrentSprite = BUTTON_SPRITE_MOUSE_OUT;
+		}
+		//Mouse is inside button
+		else
+		{
+			//Set mouse over sprite
+			switch( e->type )
+			{
+				case SDL_MOUSEMOTION:
+				mCurrentSprite = BUTTON_SPRITE_MOUSE_OVER_MOTION;
+				break;
+
+				case SDL_MOUSEBUTTONDOWN:
+				mCurrentSprite = BUTTON_SPRITE_MOUSE_DOWN;
+				break;
+
+				case SDL_MOUSEBUTTONUP:
+				mCurrentSprite = BUTTON_SPRITE_MOUSE_UP;
+				break;
+			}
+		}
+	}
+}
+
 void LButton::render(LTexture card_texture[], cards** battle_deck, int i)
 {
 	//Show current button sprite
 	//card_texture[id].render_card( mPosition.x, mPosition.y, &gSpriteClips[ mCurrentSprite ], &gSpriteClips[ mCurrentSprite ]);
 	int pos = battle_deck[i / 3][i % 3].id;
 	card_texture[pos].render_card( mPosition.x, mPosition.y, &gSpriteClips[ mCurrentSprite ]);
+}
+
+void LButton::render_hint(LTexture &texture)
+{
+	texture.render_card( mPosition.x, mPosition.y, &ButtonSpriteClips[ mCurrentSprite ]);
 }
 
 #endif

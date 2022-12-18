@@ -132,11 +132,11 @@ class cards
 
         prof.attack *= card.enemy_attack_rate;
         prof.defence -= card.enemy_defense_loss;
+        prof.hit_rate *= card.enemy_hit_rate;
+        prof.avoid_rate -= card.enemy_avoid_rate;
         if(prof.defence <= 0){
         	prof.defence = 0;
 		}
-        prof.hit_rate *= card.enemy_hit_rate;
-        prof.avoid_rate -= card.enemy_avoid_rate;
         if(prof.avoid_rate <= 0){
         	prof.avoid_rate = 0;
 		}

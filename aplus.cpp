@@ -8,7 +8,7 @@
 #include "LTexture.h"
 #include "healthbar.h"
 #include "cards.h" 
-#include "button.h" 
+#include "button.h"
 #define PI 3.14159265358979323846
 using namespace std;
 SDL_Event e;		//Event handler
@@ -48,6 +48,8 @@ Mix_Chunk *Pop = NULL;
 Mix_Chunk *Ceasarmusic = NULL;
 
 LButton gButtons[6];
+LButton HintButton;
+LButton CloseHintButton;
 const int TOTAL_BUTTONS = 5;
 
 enum game_state {				//game states
@@ -59,7 +61,8 @@ enum game_state {				//game states
 	gatcha,						//draw a test paper
 	no_school,					//student be defeated by professor
 	get_f,						//student defeated boss but did not get all paper
-	get_aplus					//student defeated boss and got all paper
+	get_aplus,					//student defeated boss and got all paper
+	show_hint
 };
 enum cheatmode{
 	o,
@@ -210,6 +213,9 @@ LTexture opening_introduction;
 LTexture dialogue_background;
 LTexture stage_text;
 LTexture deck_bg; 
+LTexture hint_texture;
+LTexture hint_word;
+LTexture closehint_texture; 
 
 student_class student;
 professor_class professor[6];
@@ -443,6 +449,12 @@ bool loadMedia()
 	if( !card_texture[20].loadFromFile("img/card_20.bmp")){
 		printf("Failed to load card_20 texture!\n");	success = false;}
 	else{card_sprite_preset();}
+	if( !hint_texture.loadFromFile("img/hintbutton.bmp") ){
+		printf("Failed to load hint button texture!\n");	success = false;}
+	else{card_sprite_preset();}
+	if( !closehint_texture.loadFromFile("img/closehintbutton.bmp") ){
+		printf("Failed to load close hint button texture!\n");	success = false;}
+	else{card_sprite_preset();}
 	if( !healthbar_texture.loadFromFile( "img/healthbar.bmp" ) ){
 		printf( "Failed to load healthbar texture!\n" );		success = false;	}
 	if( !paper_status_table_texture.loadFromFile( "img/testpaper_background.bmp" ) ){
@@ -589,6 +601,8 @@ bool loadMedia()
     if( !dialogue_background.loadFromFile( "img/dialogue_background.bmp" ) ){
         printf( "Failed to load opening dialogue_background texture!\n" );	success = false;	}
     else{diabgRect = {60,360,dialogue_background.getWidth(),dialogue_background.getHeight()};}
+	if( !hint_word.loadFromFile("img/hint.bmp") ){
+		printf( "Failed to load hint word texture!\n" );	success = false;	}
     
 	return success;
 }
@@ -628,6 +642,7 @@ void close()
 	magicball_ring_2.free(); 
 	student_health_bg.free();
 	dialogue_background.free();
+	hint_word.free();
 	
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -775,6 +790,14 @@ int main( int argc, char* args[] ){
                    	    	}
 						}
 					}
+					else if(state == show_hint){
+						CloseHintButton.handleEvent_hint(&e);
+						if(e.type == SDL_MOUSEBUTTONUP ){
+							if(CloseHintButton.mouse_on == true){
+								state = student_attacking;
+							} 
+						}
+					}
 					else if (state == enter_stage || state == student_attacking || state == professor_attacking){
 						if ( state == enter_stage ){
 							student_healthbar.init(student);
@@ -788,6 +811,9 @@ int main( int argc, char* args[] ){
 	                   	     	    	battling = true;
 									}
 	                   	     	    state = student_attacking;
+	                   	     	    for(int i=0;i<6;i++){
+	                   	     	    	gButtons[i].SetDefaultSprite();
+									}
 	                   	     	    break;
 	                   	    	}
 							}
@@ -797,8 +823,8 @@ int main( int argc, char* args[] ){
 							int row=-1,col=-1;
 							for(int i = 0 ; i < 6 ; i++){
 								gButtons[i].handleEvent(&e);
+								HintButton.handleEvent_hint(&e);
 							}
-							
 							if(e.type == SDL_MOUSEBUTTONUP ){
 								for(int i=0;i<6;i++){
 									if(gButtons[i].mouse_on == true){
@@ -808,6 +834,9 @@ int main( int argc, char* args[] ){
 										col = i%3;
 										break;
 									}
+								}
+								if(HintButton.mouse_on == true){
+									state = show_hint;
 								} 
 							}
 							else if(e.type == SDL_KEYDOWN){
@@ -1052,6 +1081,10 @@ void card_sprite_preset(){
 		gSpriteClips[ i ].y = i * 160;
 		gSpriteClips[ i ].w = BUTTON_WIDTH;
 		gSpriteClips[ i ].h = BUTTON_HEIGHT;
+		ButtonSpriteClips[ i ].x = 0;
+		ButtonSpriteClips[ i ].y = i * 40;
+		ButtonSpriteClips[ i ].w = 40;
+		ButtonSpriteClips[ i ].h = 40;
 	}
 	//Set buttons in corners
 	gButtons[0].setPosition( 225, 458 );
@@ -1059,7 +1092,9 @@ void card_sprite_preset(){
 	gButtons[2].setPosition( 945, 458 );
 	gButtons[3].setPosition( 225, 622 );
 	gButtons[4].setPosition( 585, 622 );
-	gButtons[5].setPosition( 945, 622 );	
+	gButtons[5].setPosition( 945, 622 );
+	HintButton.setPosition( 1400,0);
+	CloseHintButton.setPosition( 1400,0);	
 }
 
 void papertable_render(){
@@ -1079,7 +1114,7 @@ void battlescene_render(){
 	
 	professor_texture[stage].render( professor_pos_rect.x , professor_pos_rect.y , &professor_pos_rect );
 
-	if(start_attacking == true || state != student_attacking){
+	if(start_attacking == true || (state != student_attacking && state != show_hint)){
 		for(int i = 0 ; i < 6 ; i++){
 			gButtons[i].Freese_LButtonSprite();
 		}	
@@ -1088,10 +1123,12 @@ void battlescene_render(){
 	for(int i = 0 ; i < 6 ; i++){
 		gButtons[i].render(card_texture, battle_deck, i);
 	}
+	HintButton.render_hint(hint_texture);
 	papertable_render();
 	professor_healthbar[stage].render();	//render healthbar
 	student_healthbar.render(student);				//render healthbar
 	stud_health_render();
+	
 }
 
 void continue_button_render(){
@@ -1148,7 +1185,13 @@ void background_texture_render(){
 		continue_button_render();
 		
 	}
-	else if (state == enter_stage || state == student_attacking || state == professor_attacking){
+	else if(state == show_hint){
+		battlescene_render();
+		hint_word.render_card(60,30);
+		CloseHintButton.render_hint(closehint_texture);
+		
+	}
+	else if (state == enter_stage || state == student_attacking || state == professor_attacking ){
 		battlescene_render();
 		if(state == student_attacking && round_attacked == true){
 			round_attacked = false;
@@ -1204,8 +1247,8 @@ void background_texture_render(){
 			}
 			else{
 				state = student_attacking;
-				for(int i = 0 ; i < 6 ; i++){
-					gButtons[i].SetDefaultSprite();
+				for(int i=0;i<6;i++){
+   	     	    	gButtons[i].SetDefaultSprite();
 				}
 			}
 			while(SDL_PollEvent(&e) != 0){}

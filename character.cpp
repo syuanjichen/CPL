@@ -58,9 +58,7 @@ void student_class::hurt(double a){
 }
 
 void student_class::direct_hurt(double a){
-	a = a * ( 100.0 / (100.0 + defence) );
-	int damage = (int)a;
-		
+	int damage = a;
 	if(damage >= health ){
 		health = 0;
 		living = false;

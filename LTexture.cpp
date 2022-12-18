@@ -374,6 +374,8 @@ void LTexture::render_card( int x, int y, SDL_Rect* clip, double angle, SDL_Poin
 	SDL_RenderCopyEx( gRenderer, mTexture, clip, &renderQuad, angle, center, flip );
 }
 
+
+
 int LTexture::getWidth()
 {
 	return mWidth;
