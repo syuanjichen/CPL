@@ -17,7 +17,7 @@ const int SCREEN_WIDTH = 1440;  //Screen dimension constants
 const int SCREEN_HEIGHT = 810;
 int block_x = SCREEN_WIDTH/16;
 int block_y = SCREEN_HEIGHT/9;
-int VOLUME = 48; //music volume
+int VOLUME = 42; //music volume
 bool battling = true;
 bool gatcha_played_animation[6] = {false};
 bool round_attacked = false;
@@ -46,6 +46,7 @@ Mix_Chunk *Stunmusic = NULL;
 Mix_Chunk *Dong = NULL;
 Mix_Chunk *Pop = NULL;
 Mix_Chunk *Ceasarmusic = NULL;
+Mix_Chunk *Boeboeboe = NULL;
 
 LButton gButtons[6];
 LButton HintButton;
@@ -584,6 +585,9 @@ bool loadMedia()
     Ceasarmusic = Mix_LoadWAV( "img/ceasar.wav" );
     if( Ceasarmusic == NULL ){
         printf( "Failed to load Ceasarmusic! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
+    Boeboeboe = Mix_LoadWAV( "img/boeboeboe.wav" );
+    if( Boeboeboe == NULL ){
+        printf( "Failed to load Boeboeboe! SDL_mixer Error: %s\n", Mix_GetError() );	success = false; }
 	if( !dialogue[0].loadFromRenderedText_chinese( dialogue_text_1 ,get_f_text_color ) ){
         printf( "Failed to load dialogue text1 texture!\n" );	success = false;	}
     if( !dialogue[1].loadFromRenderedText_chinese( dialogue_text_2 ,get_f_text_color ) ){
@@ -714,8 +718,11 @@ void card_draw(cards *deck[], cards all[]){
 			if(num_of_ceasar == 0){
             	if(deck[i][j].id == -1){
             		int randnum = rand() % 21;
-            		if (randnum == 6){
-            			randnum = rand() % 21;
+            		if (randnum == 6 || randnum == 8){
+            			int place = rand() % 3;
+            			if(place <= 1){
+            				randnum = rand() % 21;
+						}
 					}
                 	deck[i][j] = (all[randnum]);
             	}
@@ -1768,6 +1775,9 @@ void stud_attack_animation( cards* card ){
 	}
 	else if( card->id == 06 ){
 		Mix_PlayChannel(-1,Ceasarmusic,0);
+	}
+	else if( card->id == 18 ){
+		Mix_PlayChannel(-1,Boeboeboe,0);
 	}
 	else{
 		if(num == 0){	Mix_PlayChannel(-1,Attackmusic1,0);}

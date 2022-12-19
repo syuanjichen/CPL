@@ -54,11 +54,11 @@ class cards
         // Water Cards
         deck[7].nature = water;
         deck[7].attack = 20;
-        deck[7].self_hit_rate = -0.05;
+        deck[7].self_hit_rate = -0.15;
 
         deck[8].nature = water;
         deck[8].attack = 15;
-        deck[8].enemy_attack_rate = 0.95;
+        deck[8].self_avoid_rate = -0.10;
 
         deck[9].nature = water;
         deck[9].attack = 10;
@@ -119,14 +119,17 @@ class cards
         if(stud.health > stud.get_health_limit()){
         	stud.health = stud.get_health_limit();
 		}
-        if(stud.hit_rate >= 1){
-        	stud.hit_rate = 1;
+        if(stud.hit_rate >= 0.95){
+        	stud.hit_rate = 0.95;
 		}
 		else if(stud.hit_rate <= 0){
 			stud.hit_rate = 0;
 		}
-        if(stud.avoid_rate >= 1){
-        	stud.avoid_rate = 1;
+        if(stud.avoid_rate >= 0.95){
+        	stud.avoid_rate = 0.95;
+		}
+		else if(stud.avoid_rate <= 0){
+        	stud.avoid_rate = 0;
 		}
 		
 
