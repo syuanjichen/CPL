@@ -2,6 +2,11 @@
 
 ## 小建議 : 不要用中文輸入法進行遊戲
 
+#### Game Version : ALPHA 1.6.1 Log :
+###### Added `ぼえぼえぼえ` sound to replace regular student attack sound if card `新葉喵克羅耶` is selected. 
+###### Buffed(?) `超極巨水砲轟滅` , `永恆暴風雪` , `最後的波紋` .
+###### Nerfed `滅火柴` .
+
 ### Game Version : ALPHA 1.6 Log :
 ###### Added hint button in game to show hint about card effects.
 
