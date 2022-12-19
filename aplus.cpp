@@ -83,7 +83,7 @@ enum hackmode{
 cheatmode cheating = o;
 hackmode hacking = oo;
 game_state state = start;	  //define state as the variable indicates current game state
-int stage = 1;				  //stage indicate which stage now is in
+int stage = 5;				  //stage indicate which stage now is in
 bool paper[3] = {};
 int paper_num = 0;
 int yes;
@@ -1206,6 +1206,7 @@ void background_texture_render(){
 		if (state == professor_attacking && round_attacked == false){
 			round_attacked = true;
 			if(!professor[stage].stunning ){
+				professor[stage].do_effect( student );
 				prof_attack_animation();
 				int hitted = probability( professor[ stage ].hit_rate, student.avoid_rate );
 				if(hitted != 0){
@@ -1216,7 +1217,6 @@ void background_texture_render(){
 					else if(num == 2){	Mix_PlayChannel(-1,Hitmusic3,0);}
 					else if(num == 3){	Mix_PlayChannel(-1,Hitmusic4,0);}
 					else if(num == 4){	Mix_PlayChannel(-1,Hitmusic5,0);}
-					professor[stage].do_effect( student );
 					student.hurt( professor[ stage ].attack );
 					SDL_Delay(300);
 					student_healthbar.update( student );
@@ -1558,12 +1558,6 @@ void prof_attack_animation(){
 			ballR.y = 275 - 120*sin(iter);
 			ballR1.x = ballR.x + 40*cos(iter*10)*cos(iter);
 			ballR1.y = ballR.y + 40*sin(iter*10)*cos(iter);
-			ballR2.x = ballR.x + 40*cos(iter*10+(PI))*cos(iter);
-			ballR2.y = ballR.y + 40*sin(iter*10+(PI))*cos(iter);
-			ballR3.x = ballR.x + 80*sin(iter*10)*cos(iter);
-			ballR3.y = ballR.y + 80*cos(iter*10)*cos(iter);
-			ballR4.x = ballR.x + 80*sin(iter*10+(PI))*cos(iter);
-			ballR4.y = ballR.y + 80*cos(iter*10+(PI))*cos(iter);
 			student_healthbar.render(student);
 			magicball.render(ballR.x,ballR.y,&ballR,-5*i);
 			magicball.render(ballR1.x,ballR1.y,&ballR1,-8*i);
@@ -1572,7 +1566,7 @@ void prof_attack_animation(){
 			SDL_Delay(20);
 		}
 	}
-	else if(professor[stage].attack >= 15 && professor[stage].attack < 50){
+	else if(professor[stage].attack >= 15 && professor[stage].attack < 100){
 		for(int i=0;i<120;i++){
 			while(SDL_PollEvent(&e) != 0){}
 			background_texture_render();
@@ -1582,10 +1576,6 @@ void prof_attack_animation(){
 			ballR1.y = ballR.y + 40*sin(iter*10)*cos(iter);
 			ballR2.x = ballR.x + 40*cos(iter*10+(PI))*cos(iter);
 			ballR2.y = ballR.y + 40*sin(iter*10+(PI))*cos(iter);
-			ballR3.x = ballR.x + 80*sin(iter*10)*cos(iter);
-			ballR3.y = ballR.y + 80*cos(iter*10)*cos(iter);
-			ballR4.x = ballR.x + 80*sin(iter*10+(PI))*cos(iter);
-			ballR4.y = ballR.y + 80*cos(iter*10+(PI))*cos(iter);
 			student_healthbar.render(student);
 			magicball.render(ballR.x,ballR.y,&ballR,-5*i);
 			magicball.render(ballR1.x,ballR1.y,&ballR1,-8*i);
@@ -1595,20 +1585,20 @@ void prof_attack_animation(){
 			SDL_Delay(20);
 		}
 	}
-	else if(professor[stage].attack >= 50){
+	else if(professor[stage].attack >= 100){
 		for(int i=0;i<120;i++){
 			while(SDL_PollEvent(&e) != 0){}
 			background_texture_render();
 			ballR.x = 700 + 60*cos(iter) - i/2 * 5;
 			ballR.y = 275 - 120*sin(iter);
-			ballR1.x = ballR.x + 40*cos(iter*10)*cos(iter);
-			ballR1.y = ballR.y + 40*sin(iter*10)*cos(iter);
-			ballR2.x = ballR.x + 40*cos(iter*10+(PI))*cos(iter);
-			ballR2.y = ballR.y + 40*sin(iter*10+(PI))*cos(iter);
-			ballR3.x = ballR.x + 80*sin(iter*10)*cos(iter);
-			ballR3.y = ballR.y + 80*cos(iter*10)*cos(iter);
-			ballR4.x = ballR.x + 80*sin(iter*10+(PI))*cos(iter);
-			ballR4.y = ballR.y + 80*cos(iter*10+(PI))*cos(iter);
+			ballR1.x = ballR.x + 60*cos(iter*10)*cos(iter);
+			ballR1.y = ballR.y + 60*sin(iter*10)*cos(iter);
+			ballR2.x = ballR.x + 60*cos(iter*10+(PI))*cos(iter);
+			ballR2.y = ballR.y + 60*sin(iter*10+(PI))*cos(iter);
+			ballR3.x = ballR.x + 100*sin(iter*10)*cos(iter);
+			ballR3.y = ballR.y + 100*cos(iter*10)*cos(iter);
+			ballR4.x = ballR.x + 100*sin(iter*10+(PI))*cos(iter);
+			ballR4.y = ballR.y + 100*cos(iter*10+(PI))*cos(iter);
 			student_healthbar.render(student);
 			magicball.render(ballR.x,ballR.y,&ballR,-5*i);
 			magicball.render(ballR1.x,ballR1.y,&ballR1,-8*i);
@@ -1626,14 +1616,6 @@ void prof_attack_animation(){
 			background_texture_render();
 			ballR.x = 700 + 60*cos(iter) - i/2 * 5;
 			ballR.y = 275 - 120*sin(iter);
-			ballR1.x = ballR.x + 40*cos(iter*10)*cos(iter);
-			ballR1.y = ballR.y + 40*sin(iter*10)*cos(iter);
-			ballR2.x = ballR.x + 40*cos(iter*10+(PI))*cos(iter);
-			ballR2.y = ballR.y + 40*sin(iter*10+(PI))*cos(iter);
-			ballR3.x = ballR.x + 80*sin(iter*10)*cos(iter);
-			ballR3.y = ballR.y + 80*cos(iter*10)*cos(iter);
-			ballR4.x = ballR.x + 80*sin(iter*10+(PI))*cos(iter);
-			ballR4.y = ballR.y + 80*cos(iter*10+(PI))*cos(iter);
 			student_healthbar.render(student);
 			magicball.render(ballR.x,ballR.y,&ballR,-5*i);
 			SDL_RenderPresent( gRenderer );
@@ -1896,6 +1878,7 @@ void you_suck(bool init){
 			diabgRect.h = stage_text.getHeight() + 40 ;
 				
 			for(int i=0;i<=60;i++){
+				while(SDL_PollEvent(&e) != 0){}
 				diabgRect.w = 1440/60 * i;
 				dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
 				SDL_RenderPresent( gRenderer );
@@ -1906,6 +1889,7 @@ void you_suck(bool init){
 			stage_text.render(rrrr.x,rrrr.y,&rrrr);
 			SDL_RenderPresent( gRenderer );
 			SDL_Delay(3000);
+			while(SDL_PollEvent(&e) != 0){}
 		}
 	}
 	else{
@@ -1924,7 +1908,7 @@ void stage_clear(bool init){
 			diabgRect.h = stage_text.getHeight() + 40 ;
 				
 			for(int i=0;i<=60;i++){
-				PollEventResult = SDL_PollEvent(&e);
+				while(SDL_PollEvent(&e) != 0){}
 				diabgRect.w = 1440/60 * i;
 				dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
 				SDL_RenderPresent( gRenderer );
@@ -1934,7 +1918,9 @@ void stage_clear(bool init){
 			SDL_Rect rrrr = {720 - stage_text.getWidth()/2,70,stage_text.getWidth(),stage_text.getHeight() };
 			stage_text.render(rrrr.x,rrrr.y,&rrrr);
 			SDL_RenderPresent( gRenderer );
+			while(SDL_PollEvent(&e) != 0){}
 			SDL_Delay(5000);
+			while(SDL_PollEvent(&e) != 0){}
 		}
 	}
 	else{
@@ -1983,15 +1969,18 @@ void ending_check(){
 		SDL_RenderPresent(gRenderer);
 		Mix_PlayChannel( -1, Pop, 0 );
 		SDL_Delay(5000);
+		while(SDL_PollEvent(&e) != 0){}
 	}
 	else{
 		if( !stage_text.loadFromRenderedText_title( "NOT ELEGENT! " , godsound_color) ){
 			printf("Failed to load  ALL CLEAR!  ");}
+		while(SDL_PollEvent(&e) != 0){}
 		SDL_Rect rrrr = {720 - stage_text.getWidth()/2,70,stage_text.getWidth(),stage_text.getHeight() };
 		stage_text.render(rrrr.x,rrrr.y,&rrrr);
 		SDL_RenderPresent(gRenderer);
 		Mix_PlayChannel( -1, Pop, 0 );
 		SDL_Delay(5000);
+		while(SDL_PollEvent(&e) != 0){}
 	}
 }
 

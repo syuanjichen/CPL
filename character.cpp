@@ -136,7 +136,7 @@ professor_class::professor_class(int a){
 			stun_counter = 0;
 			break;	
 		case 2:
-			health_limit = 400;
+			health_limit = 800;
 			difficulty = 2;
 			element = grass;
 			living = true;
@@ -154,13 +154,13 @@ professor_class::professor_class(int a){
 			break;
 			
 		case 3:
-			health_limit = 600;
+			health_limit = 1400;
 			difficulty = 3;
 			element = fire;
 			living = true;
 			health = health_limit;
 			shield = 0;
-			attack = 10;
+			attack = 30;
 			defence = 150;
 			hit_rate = 0.96;
 			avoid_rate = 0.2;
@@ -173,13 +173,13 @@ professor_class::professor_class(int a){
 			
 			
 		case 4:
-			health_limit = 1000;
+			health_limit = 2000;
 			difficulty = 4;
 			element = grass;
 			living = true;
 			health = health_limit;
 			shield = 0;
-			attack = 20;
+			attack = 50;
 			defence = 250;
 			hit_rate = 0.90;
 			avoid_rate = 0.3;
@@ -190,13 +190,13 @@ professor_class::professor_class(int a){
 			stun_counter = 5;
 			break;
 		case 0:
-			health_limit = 2000;
+			health_limit = 3000;
 			difficulty = 100;
 			element = water;
 			living = true;
 			health = health_limit;
 			shield = 0;
-			attack = 20;
+			attack = 30;
 			defence = 350;
 			hit_rate = 1.00;
 			avoid_rate = 0.40;
@@ -212,7 +212,7 @@ professor_class::professor_class(int a){
 void professor_class::do_effect(student_class &student){
 	switch ( special ){
 		case health_to_attack:
-			this->attack = 20 + (this->get_health_limit() - this->health);
+			this->attack = 30 + (this->get_health_limit() - this->health);
 		break;
 
 		case swifty:
