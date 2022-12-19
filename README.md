@@ -3,6 +3,9 @@
 ## 小建議 : 不要用中文輸入法進行遊戲
 
 #### Game Version : ALPHA 1.6.1 Log :
+###### Buffed `管院猴，但是很快` , `火爆教授` , `老婆` , `棄天帝` .
+
+#### Game Version : ALPHA 1.6.1 Log :
 ###### Added `ぼえぼえぼえ` sound to replace regular student attack sound if card `新葉喵克羅耶` is selected. 
 ###### Buffed(?) `超極巨水砲轟滅` , `永恆暴風雪` , `最後的波紋` .
 ###### Nerfed `滅火柴` .
