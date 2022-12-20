@@ -2,7 +2,7 @@
 
 ## 小建議 : 不要用中文輸入法進行遊戲
 
-#### Game Version : ALPHA 1.6.2 Log :
+#### Game Version : ALPHA 1.6.3 Log :
 ###### Fixed bug of showing multiple explanation text in stage  `棄天帝` .
 
 #### Game Version : ALPHA 1.6.2 Log :
