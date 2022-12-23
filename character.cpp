@@ -142,7 +142,7 @@ professor_class::professor_class(int a){
 			living = true;
 			health = health_limit;
 			shield = 0;
-			attack = 15;
+			attack = 25;
 			defence = 150;
 			hit_rate = 1.00;
 			avoid_rate = 1.00;
@@ -160,10 +160,10 @@ professor_class::professor_class(int a){
 			living = true;
 			health = health_limit;
 			shield = 0;
-			attack = 30;
+			attack = 45;
 			defence = 150;
-			hit_rate = 0.96;
-			avoid_rate = 0.2;
+			hit_rate = 1.00;
+			avoid_rate = 0.20;
 			burning = false;
 			stunning = false;
 			special = firing;
@@ -179,7 +179,7 @@ professor_class::professor_class(int a){
 			living = true;
 			health = health_limit;
 			shield = 0;
-			attack = 50;
+			attack = 75;
 			defence = 250;
 			hit_rate = 0.90;
 			avoid_rate = 0.3;
@@ -190,7 +190,7 @@ professor_class::professor_class(int a){
 			stun_counter = 5;
 			break;
 		case 0:
-			health_limit = 3000;
+			health_limit = 3600;
 			difficulty = 100;
 			element = water;
 			living = true;
@@ -212,7 +212,7 @@ professor_class::professor_class(int a){
 void professor_class::do_effect(student_class &student){
 	switch ( special ){
 		case health_to_attack:
-			this->attack = 30 + (this->get_health_limit() - this->health);
+			this->attack = 30 + (this->get_health_limit() - this->health) * log10((this->get_health_limit() - this->health));
 		break;
 
 		case swifty:
@@ -233,7 +233,7 @@ void professor_class::do_effect(student_class &student){
 		break;
 		
 		case firing:
-		if(this->ignite_counter >= 5){
+		if(this->ignite_counter >= 4){
 			student.burning = true;
 			this->ignite_counter = 0;
 		}
