@@ -950,7 +950,7 @@ int main( int argc, char* args[] ){
 							if( start_attacking ){
 								if(!student.stunning){
 									int professor_hurt_damage = -1;			//the damage professor take
-									if(hacking == hack)	selected_card.set_attack(10000);
+									if(hacking == hack)	selected_card.set_attack(1000000);
 									card_effect(selected_card, professor[stage], student);
 									student_healthbar.update(student);
 									
