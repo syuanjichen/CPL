@@ -2,6 +2,10 @@
 
 ## 小建議 : 不要用中文輸入法進行遊戲
 
+#### Game Version : ALPHA 1.6.4 Log :
+###### Buffed `管院猴，但是很快` , `火爆教授` , `老婆` , `棄天帝` .
+###### Buffed `hack mode` .
+
 #### Game Version : ALPHA 1.6.3 Log :
 ###### Fixed bug of showing multiple explanation text in stage  `棄天帝` .
 
