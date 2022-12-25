@@ -951,13 +951,14 @@ int main( int argc, char* args[] ){
 								if(!student.stunning){
 									int professor_hurt_damage = -1;			//the damage professor take
 									if(hacking == hack)	selected_card.set_attack(1000000);
-									card_effect(selected_card, professor[stage], student);
+									
 									student_healthbar.update(student);
 									
 									stud_attack_animation( &selected_card ); //attack
 									
 									if( probability(student.hit_rate,professor[stage].avoid_rate) == 1){
 										professor_hurt_damage = professor[stage].hurt(selected_card);	//professor get hurt 
+										card_effect(selected_card, professor[stage], student);
 										render_damage_text(professor_hurt_damage);
 										professor_healthbar[stage].update(professor[stage]);
 									}
