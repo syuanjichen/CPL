@@ -2,6 +2,9 @@
 
 ## 小建議 : 不要用中文輸入法進行遊戲
 
+#### Game Version : ALPHA 1.6.5 Log :
+###### Boosted the attack animations.
+
 #### Game Version : ALPHA 1.6.4 Log :
 ###### Buffed `管院猴，但是很快` , `火爆教授` , `老婆` , `棄天帝` .
 ###### Buffed `hack mode` .
