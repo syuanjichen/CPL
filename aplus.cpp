@@ -274,7 +274,7 @@ bool init()
 	}
 	
 	//Create renderer for window
-	gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+	gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED  );
 	if( gRenderer == NULL )
 	{
 		printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -1146,6 +1146,7 @@ void continue_button_render(){
 	SDL_Rect pos = {SCREEN_WIDTH/2 - continue_button.getWidth() / 2 , 710,continue_button.getWidth(),continue_button.getHeight()};
 	continue_button.render(pos.x, pos.y,&pos);
 	continue_button_iterator += 0.02;
+	SDL_Delay(7); 
 }
 
 void quitgame_button_render(){
@@ -1156,6 +1157,7 @@ void quitgame_button_render(){
 	SDL_Rect pos = {SCREEN_WIDTH/2 - quitgame_button.getWidth() / 2 , 710,quitgame_button.getWidth(),quitgame_button.getHeight()};
 	quitgame_button.render(pos.x, pos.y,&pos);
 	quitgame_button_iterator += 0.02;
+	SDL_Delay(7);
 }
 
 void background_texture_render(){
@@ -1266,6 +1268,7 @@ void background_texture_render(){
                 if(shown_explanation[1] == false){
 		        	shown_explanation[1] = true;
 					for(int i=0;i<50;i++){
+						while(SDL_PollEvent(&e) != 0){}
 						diabgRect.y = 630 - dialogue_background.getHeight()/100 * i ;
 						diabgRect.h = dialogue_background.getHeight()/50 * i ;
 						dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
@@ -1282,6 +1285,7 @@ void background_texture_render(){
                 if(shown_explanation[2] == false){
 		        	shown_explanation[2] = true;
 					for(int i=0;i<50;i++){
+						while(SDL_PollEvent(&e) != 0){}
 						diabgRect.y = 630 - dialogue_background.getHeight()/100 * i ;
 						diabgRect.h = dialogue_background.getHeight()/50 * i ;
 						dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
@@ -1298,6 +1302,7 @@ void background_texture_render(){
                 if(shown_explanation[3] == false){
 		        	shown_explanation[3] = true;
 					for(int i=0;i<50;i++){
+						while(SDL_PollEvent(&e) != 0){}
 						diabgRect.y = 630 - dialogue_background.getHeight()/100 * i ;
 						diabgRect.h = dialogue_background.getHeight()/50 * i ;
 						dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
@@ -1314,6 +1319,7 @@ void background_texture_render(){
                 if(shown_explanation[4] == false){
 		        	shown_explanation[4] = true;
 					for(int i=0;i<50;i++){
+						while(SDL_PollEvent(&e) != 0){}
 						diabgRect.y = 630 - dialogue_background.getHeight()/100 * i ;
 						diabgRect.h = dialogue_background.getHeight()/50 * i ;
 						dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
@@ -1331,6 +1337,7 @@ void background_texture_render(){
                 if(shown_explanation[5] == false){
 		        	shown_explanation[5] = true;
 					for(int i=0;i<50;i++){
+						while(SDL_PollEvent(&e) != 0){}
 						diabgRect.y = 630 - dialogue_background.getHeight()/100 * i ;
 						diabgRect.h = dialogue_background.getHeight()/50 * i ;
 						dialogue_background.render(diabgRect.x,diabgRect.y,&diabgRect);
@@ -1563,7 +1570,7 @@ void prof_attack_animation(){
 			magicball.render(ballR1.x,ballR1.y,&ballR1,-8*i);
 			SDL_RenderPresent( gRenderer );
 			iter -= (PI)/120;
-			SDL_Delay(20);
+			SDL_Delay(10);
 		}
 	}
 	else if(professor[stage].attack >= 15 && professor[stage].attack < 100){
@@ -1582,7 +1589,7 @@ void prof_attack_animation(){
 			magicball.render(ballR2.x,ballR2.y,&ballR2,8*i);
 			SDL_RenderPresent( gRenderer );
 			iter -= (PI)/120;
-			SDL_Delay(20);
+			SDL_Delay(10);
 		}
 	}
 	else if(professor[stage].attack >= 100){
@@ -1607,7 +1614,7 @@ void prof_attack_animation(){
 			magicball.render(ballR4.x,ballR4.y,&ballR4,8*i);
 			SDL_RenderPresent( gRenderer );
 			iter -= (PI)/120;
-			SDL_Delay(20);
+			SDL_Delay(10);
 		}
 	}
 	else{
@@ -1620,7 +1627,7 @@ void prof_attack_animation(){
 			magicball.render(ballR.x,ballR.y,&ballR,-5*i);
 			SDL_RenderPresent( gRenderer );
 			iter -= (PI)/120;
-			SDL_Delay(20);
+			SDL_Delay(10);
 		}
 	}
 	while(SDL_PollEvent(&e) != 0){}
@@ -1785,7 +1792,7 @@ void stud_attack_animation( cards* card ){
 		magicball_ring_2.render(ringR.x,ringR.y,&ringR  , -5*i);
 		deg = 5*i;
 		SDL_RenderPresent( gRenderer );
-		SDL_Delay(10);
+		SDL_Delay(5);
 	}
 }
 
